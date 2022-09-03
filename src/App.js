@@ -553,7 +553,14 @@ export default function App() {
           }
         </Box>
       </Header>
-      <Box align="center">
+      <Box align="center" style={{
+        position: "fixed",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100%",
+        width: "100%"
+      }}>
         <Heading>Instructions</Heading>
         <Paragraph>
           Move: WASD<br/>
