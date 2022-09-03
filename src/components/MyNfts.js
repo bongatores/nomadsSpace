@@ -47,7 +47,6 @@ export default function MyNfts (props) {
               <CardBody pad="small"><Image alignSelf="center" src={uri} width="150px"/></CardBody>
               <CardFooter pad={{horizontal: "small"}} background="light-2" align="center" alignContent="center">
                 <Button secondary onClick={() => {
-                  document.getElementById("uri").value = obj.uri;
                   props.setMetadata(obj.uri)
                 }} size="small" label="Select" />
               </CardFooter>
@@ -86,7 +85,6 @@ export default function MyNfts (props) {
               <CardBody pad="small"><Image alignSelf="center" src={uri} width="150px"/></CardBody>
               <CardFooter pad={{horizontal: "large"}} background="light-2" align="center" alignContent="center">
                 <Button secondary onClick={() => {
-                  document.getElementById("uri").value = obj.uri;
                   props.setMetadata(obj.uri)
                 }} size="small" label="Select"/>
               </CardFooter>

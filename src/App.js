@@ -1,4 +1,4 @@
-import {useState,useEffect,useMemo,useCallback} from 'react';
+import {useState,useEffect,useMemo,useCallback,useRef} from 'react';
 import * as THREE from 'three';
 import {
   Button,
@@ -60,7 +60,6 @@ export default function App() {
   const [myOwnedERC1155,setMyOwnedERC1155] = useState();
 
   const [gameContract,setGameContract] = useState();
-  const [sendingTx,setSendingTx] = useState();
 
   const [loadingMyNFTs,setLoadingMyNFTs] = useState(true);
 
@@ -75,6 +74,8 @@ export default function App() {
   const [scenario,setScenario] = useState();
   const [url,setUrl] = useState();
 
+
+  const ref = useRef({})
 
 
   const getMetadata = item => {
@@ -126,7 +127,6 @@ export default function App() {
   }
 
   let camera, scene, renderer, controls;
-
   const objects = [];
 
   let raycaster;
@@ -136,7 +136,6 @@ export default function App() {
   let moveLeft = false;
   let moveRight = false;
   let canJump = false;
-  let occupy;
 
   let prevTime = performance.now();
   const velocity = new THREE.Vector3();
@@ -145,10 +144,28 @@ export default function App() {
   const color = new THREE.Color();
 
 
-  useEffect(() => {
-    document.getElementById("uri").value = uri;
-  },[uri])
 
+  useEffect(() => {
+    ref.current = {
+      provider: provider,
+      coinbase: coinbase,
+      netId: netId,
+      profile: profile,
+      user: user,
+      self: self,
+      uri: uri,
+      gameContract: gameContract
+    }
+  },[
+    coinbase,
+    provider,
+    netId,
+    user,
+    profile,
+    self,
+    uri,
+    gameContract
+  ]);
   useEffect(() => {
     if(!initiated) return;
     setInit(false);
@@ -169,6 +186,7 @@ export default function App() {
       newGameContract = new ethers.Contract(addresses.game.mumbai,abis.game,provider);
     }
     setGameContract(newGameContract);
+
   },[netId,provider])
   useEffect(async () => {
     if(client && coinbase && netId){
@@ -223,26 +241,34 @@ export default function App() {
         break;
 
       case 'KeyP':
-        setSendingTx(true)
-        if(!sendingTx && !occupy && coinbase && gameContract){
+        const coinbaseGame = ref.current.coinbase;
+        const contract = ref.current.gameContract;
+        const gameProvider = ref.current.provider;
+        const sendingTxGame = ref.current.sendingTx;
+        console.log(ref.current)
+        if(!sendingTxGame && coinbaseGame && contract){
+          ref.current = {
+            ...ref.current,
+            sendingTx: true
+          }
           try{
-            occupy = true;
-            let string = document.getElementById("uri").value;
+            let string =ref.current.uri;
+            console.log(string)
+            if(!string) return;
             if(self){
               string = self.id
             }
 
-            const signer = provider.getSigner();
-            const gameContractWithSigner = gameContract.connect(signer);
+            const signer = gameProvider.getSigner();
+            const gameContractWithSigner = contract.connect(signer);
             const tx = await gameContractWithSigner.requestRandomWords(string);
             await tx.wait();
-            setSendingTx(false)
-            occupy = false;
-
           } catch(err){
             console.log(err)
-            occupy = false;
-            setSendingTx(false)
+          }
+          ref.current = {
+            ...ref.current,
+            sendingTx: false
           }
         }
 
@@ -284,6 +310,133 @@ export default function App() {
     }
 
   };
+
+
+  const checkUris = async () => {
+    const contractInitiated = ref.current?.contractInitiated;
+    const contract = ref.current?.gameContract;
+
+    if(contract && !contractInitiated){ //&& coinbase){
+      try {
+        /*
+        for(let i = 0; i < 1999;i++){
+          for(let j = 0;j<1999;j++){
+            const urigame = await gameContract.uri(i,j);
+            if(urigame){
+              ...
+              if(metadata.scenario){
+                const loader = new GLTFLoader().setPath(`https://nftstorage.link/ipfs/${metadata.scenario}/gltf/` );
+                loader.load( 'scene.gltf', function ( gltf ) {
+                  console.log(gltf)
+                  gltf.scene.position.set(i,1,j)
+                  gltf.scene.scale.set(gltf.scene.scale.x*1.2,gltf.scene.scale.y*1.2,gltf.scene.scale.z*1.2)
+                  scene.add( gltf.scene );
+
+
+                } );
+                gameInfo.position.set(i,10,j)
+
+              }
+            }
+          }
+        }
+        */
+        const gameInfo = new THREE.Group()
+        const uriGame = await contract.uri();
+        let metadata;
+        if(uriGame.includes("did")){
+          // Get profile info from ceramic.network
+          const userProfile = await core.get('basicProfile',uriGame);
+          if(!userProfile){
+            return
+          }
+          metadata = {
+            name: userProfile.name ? userProfile.name : uriGame,
+            description: userProfile.description,
+            image: userProfile.image ?
+                   userProfile.image :
+                   makeBlockie(uriGame),
+            external_url: userProfile.url,
+            scenario: userProfile.scenario
+          }
+        } else {
+          // Assumes it is nft metadata
+          metadata = JSON.parse(await (await fetch(`https://nftstorage.link/ipfs/${uriGame.replace("ipfs://","")}`)).text());
+        }
+        const imgTexture = new THREE.TextureLoader().load(metadata.image.replace("ipfs://","https://nftstorage.link/ipfs/"));
+        const material = new THREE.SpriteMaterial({ map: imgTexture});
+        const sprite = new THREE.Sprite(material);
+        console.log(metadata)
+        const name = new SpriteText(metadata.name,20,"red");
+        const description =  new SpriteText(metadata.description,10,"blue")
+        const external_url = new SpriteText(metadata.external_url,8,"green")
+        sprite.scale.set(20,20,20)
+        name.position.y = 60;
+        description.position.y = 30;
+        external_url.position.y = 20
+        gameInfo.add(sprite)
+        gameInfo.add(name)
+        gameInfo.add(description)
+        gameInfo.add(external_url)
+        if(metadata.scenario){
+          const loader = new GLTFLoader().setPath(`https://nftstorage.link/ipfs/${metadata.scenario}/gltf/` );
+          loader.load( 'scene.gltf', function ( gltf ) {
+            console.log(gltf)
+            gltf.scene.position.set(0,1,0)
+            gltf.scene.scale.set(gltf.scene.scale.x*1.2,gltf.scene.scale.y*1.2,gltf.scene.scale.z*1.2)
+            scene.add( gltf.scene );
+
+
+          });
+        }
+
+        gameInfo.position.set(0,10,0)
+        scene.add(gameInfo);
+
+        const filter = contract.filters.Result();
+        contract.on(filter,handleEvents)
+
+      } catch(err){
+        console.log(err)
+      }
+    }
+    ref.current = {
+      ...ref.current,
+      contractInitiated: true
+    }
+  }
+
+  const handleEvents = (uri,requestId,result) => {
+
+      console.log(`Event: URI - ${uri} Result - ${result}`);
+      if(result){
+        if(uri === ref.current?.uri){
+
+        } else {
+
+        }
+        setUri(uri);
+      } else {
+        let i = 0;
+        if(uri === ref.current?.uri){
+
+        } else {
+
+        }
+        /*
+        const metorsInterval = setInterval(() => {
+          if(i < 100){
+
+          } else {
+            clearInterval(metorsInterval);
+          }
+          i = i + 1;
+        },500);
+        */
+
+      }
+  }
+
   async function init() {
 
     camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -302,12 +455,8 @@ export default function App() {
     const instructions = document.getElementById( 'instructions' );
 
     instructions.addEventListener( 'click', function () {
-      document.getElementsByTagName("canvas")[0]?.remove()
-      setInit(true)
       controls.lock();
-
-
-    } );
+    });
 
     controls.addEventListener( 'lock', function () {
 
@@ -370,90 +519,6 @@ export default function App() {
     const floor = new THREE.Mesh( floorGeometry, floorMaterial );
     scene.add( floor );
 
-
-    if(gameContract){ //&& coinbase){
-      try {
-        /*
-        for(let i = 0; i < 1999;i++){
-          for(let j = 0;j<1999;j++){
-            const urigame = await gameContract.uri(i,j);
-            if(urigame){
-              ...
-              if(metadata.scenario){
-                const loader = new GLTFLoader().setPath(`https://nftstorage.link/ipfs/${metadata.scenario}/gltf/` );
-                loader.load( 'scene.gltf', function ( gltf ) {
-                  console.log(gltf)
-                  gltf.scene.position.set(i,1,j)
-                  gltf.scene.scale.set(gltf.scene.scale.x*1.2,gltf.scene.scale.y*1.2,gltf.scene.scale.z*1.2)
-                  scene.add( gltf.scene );
-
-
-                } );
-                gameInfo.position.set(i,10,j)
-
-              }
-            }
-          }
-        }
-        */
-        const gameInfo = new THREE.Group()
-        const uriGame = await gameContract.uri();
-        let metadata;
-        if(uriGame.includes("did")){
-          // Get profile info from ceramic.network
-          const userProfile = await core.get('basicProfile',uriGame);
-          if(!userProfile){
-            return
-          }
-          metadata = {
-            name: userProfile.name ? userProfile.name : uriGame,
-            description: userProfile.description,
-            image: userProfile.image ?
-                   userProfile.image :
-                   makeBlockie(uriGame),
-            external_url: userProfile.url,
-            scenario: userProfile.scenario
-          }
-        } else {
-          // Assumes it is nft metadata
-          metadata = JSON.parse(await (await fetch(`https://nftstorage.link/ipfs/${uriGame.replace("ipfs://","")}`)).text());
-        }
-        const imgTexture = new THREE.TextureLoader().load(metadata.image.replace("ipfs://","https://nftstorage.link/ipfs/"));
-        const material = new THREE.SpriteMaterial({ map: imgTexture});
-        const sprite = new THREE.Sprite(material);
-        console.log(metadata)
-        const name = new SpriteText(metadata.name,20,"red");
-        const description =  new SpriteText(metadata.description,10,"blue")
-        const external_url = new SpriteText(metadata.external_url,8,"green")
-        sprite.scale.set(20,20,20)
-        name.position.y = 60;
-        description.position.y = 30;
-        external_url.position.y = 20
-        gameInfo.add(sprite)
-        gameInfo.add(name)
-        gameInfo.add(description)
-        gameInfo.add(external_url)
-        if(metadata.scenario){
-          const loader = new GLTFLoader().setPath(`https://nftstorage.link/ipfs/${metadata.scenario}/gltf/` );
-          loader.load( 'scene.gltf', function ( gltf ) {
-            console.log(gltf)
-            gltf.scene.position.set(0,1,0)
-            gltf.scene.scale.set(gltf.scene.scale.x*1.2,gltf.scene.scale.y*1.2,gltf.scene.scale.z*1.2)
-            scene.add( gltf.scene );
-
-
-          });
-        }
-
-        gameInfo.position.set(0,10,0)
-        scene.add(gameInfo);
-
-        const filter = gameContract.filters.Result();
-      } catch(err){
-        console.log(err)
-      }
-    }
-
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
@@ -476,6 +541,11 @@ export default function App() {
   }
 
   async function animate() {
+
+    const contractInitiated = ref.current?.contractInitiated;
+    if(!contractInitiated){
+      await checkUris();
+    }
     requestAnimationFrame( animate );
     const time = performance.now();
     if ( controls.isLocked === true ) {
@@ -558,7 +628,6 @@ export default function App() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        height: "100%",
         width: "100%"
       }}>
         <Heading>Instructions</Heading>
@@ -570,7 +639,7 @@ export default function App() {
             coinbase &&
             <>
             <br/>
-            Ocupy: P
+            Occupy: P
             </>
           }
         </Paragraph>
@@ -580,8 +649,9 @@ export default function App() {
             !coinbase ?
             <Button onClick={loadWeb3Modal} label="Connect wallet" /> :
             !self &&
+            window.ethereum &&
             <Button onClick={async () => {
-              const newSelf = await authenticateWithEthereum(provider,coinbase);
+              const newSelf = await authenticateWithEthereum(coinbase);
               const newProfile = await newSelf.get('basicProfile');
               setSelf(newSelf);
               setProfile(newProfile);
@@ -595,7 +665,6 @@ export default function App() {
         <Paragraph style={{wordBreak: 'break-word'}}>
           ChainId: {netId}
         </Paragraph>
-        <TextInput hidden id="uri"/>
 
         {
           uri &&
