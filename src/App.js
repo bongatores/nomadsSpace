@@ -1,4 +1,4 @@
-import {useState,useEffect,useMemo,useCallback,useRef} from 'react';
+import {useState,useEffect,useRef} from 'react';
 import * as THREE from 'three';
 import {
   Button,
@@ -21,7 +21,7 @@ import  abis  from "./contracts/abis";
 
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls'
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-import { AmmoPhysics } from 'three/addons/physics/AmmoPhysics.js';
+//import { AmmoPhysics } from 'three/addons/physics/AmmoPhysics.js';
 
 
 import { Core } from '@self.id/core'
@@ -76,7 +76,6 @@ export default function App() {
 
 
   const ref = useRef({})
-
 
   const getMetadata = item => {
     return(
@@ -437,6 +436,48 @@ export default function App() {
       }
   }
 
+  const generateFloor = () => {
+    // floor
+
+    let floorGeometry = new THREE.PlaneGeometry( 2000, 2000, 100, 100 );
+    floorGeometry.rotateX( - Math.PI / 2 );
+
+    // vertex displacement
+
+    let position = floorGeometry.attributes.position;
+
+    for ( let i = 0, l = position.count; i < l; i ++ ) {
+
+      vertex.fromBufferAttribute( position, i );
+
+      vertex.x += Math.random() * 20 - 10;
+      vertex.y += Math.random() * 2;
+      vertex.z += Math.random() * 20 - 10;
+
+      position.setXYZ( i, vertex.x, vertex.y, vertex.z );
+
+    }
+
+    floorGeometry = floorGeometry.toNonIndexed(); // ensure each face has unique vertices
+
+    position = floorGeometry.attributes.position;
+    const colorsFloor = [];
+
+    for ( let i = 0, l = position.count; i < l; i ++ ) {
+
+      color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+      colorsFloor.push( color.r, color.g, color.b );
+
+    }
+
+    floorGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colorsFloor, 3 ) );
+
+    const floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: true } );
+
+    const floor = new THREE.Mesh( floorGeometry, floorMaterial );
+    scene.add( floor );
+  }
+
   async function init() {
 
     camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -479,45 +520,7 @@ export default function App() {
 
     raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
 
-    // floor
-
-    let floorGeometry = new THREE.PlaneGeometry( 2000, 2000, 100, 100 );
-    floorGeometry.rotateX( - Math.PI / 2 );
-
-    // vertex displacement
-
-    let position = floorGeometry.attributes.position;
-
-    for ( let i = 0, l = position.count; i < l; i ++ ) {
-
-      vertex.fromBufferAttribute( position, i );
-
-      vertex.x += Math.random() * 20 - 10;
-      vertex.y += Math.random() * 2;
-      vertex.z += Math.random() * 20 - 10;
-
-      position.setXYZ( i, vertex.x, vertex.y, vertex.z );
-
-    }
-
-    floorGeometry = floorGeometry.toNonIndexed(); // ensure each face has unique vertices
-
-    position = floorGeometry.attributes.position;
-    const colorsFloor = [];
-
-    for ( let i = 0, l = position.count; i < l; i ++ ) {
-
-      color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-      colorsFloor.push( color.r, color.g, color.b );
-
-    }
-
-    floorGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colorsFloor, 3 ) );
-
-    const floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: true } );
-
-    const floor = new THREE.Mesh( floorGeometry, floorMaterial );
-    scene.add( floor );
+    generateFloor();
 
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
