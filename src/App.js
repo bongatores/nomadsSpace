@@ -1,6 +1,8 @@
 import {useState,useEffect,useRef} from 'react';
 import * as THREE from 'three';
 import {
+  Accordion,
+  AccordionPanel,
   Button,
   Header,
   Heading,
@@ -606,9 +608,9 @@ export default function App() {
   return (
     <>
     <Box id="blocker">
-      <Header background="brand" align="start">
-        <Heading margin="small">EmptySpace</Heading>
-        <Box align="end" pad="medium" alignContent="center" >
+      <Header background="brand" align="start" className='navbar'>
+        <Heading className='heading' margin="small">EMPTY Space</Heading>
+        <Box align="end" pad="small" alignContent="center" >
           {
             coinbase ?
             <Button onClick={() => {
@@ -622,31 +624,35 @@ export default function App() {
             netId && coinbase &&
             <Text size="xsmall" alignSelf="center" alignContent="center">
               ChainId: {netId}
+              <br/>
+              Connected as: {user ? user.user.sub : profile?.name ? profile.name : coinbase ? coinbase : "Guest"}
             </Text>
           }
         </Box>
       </Header>
-      <Box align="center" style={{
-        position: "fixed",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        width: "100%"
-      }}>
-        <Heading>Instructions</Heading>
-        <Paragraph>
-          Move: WASD<br/>
-          Jump: SPACE<br/>
-          Look: MOUSE
+      <Box align="center" className='menu_box'>
+        <Heading className='inst_head'>Welcome to <br/><span style={
           {
-            coinbase &&
-            <>
-            <br/>
-            Occupy: P
-            </>
+            fontFamily: 'franchise',
+            fontSize: '100px',
+            marginTop:'5px',
+            display:'block',
           }
-        </Paragraph>
-        <Box direction="row">
+        }>Empty Space</span></Heading>
+        <p style={
+          {
+            textAlign: 'center'
+          }
+        }>
+          A game where every space is your space until it's not. <br/>
+          Start playing now!
+        </p>
+
+        <Box direction="row" style={
+          {
+            marginBottom: '15px'
+          }
+        }>
           <Button primary label="Click to play" id="instructions" />
           {
             !coinbase ?
@@ -662,12 +668,12 @@ export default function App() {
             }} label="Connect ceramic" />
           }
         </Box>
-        <Paragraph style={{wordBreak: 'break-word'}}>
+        {/* <Paragraph style={{wordBreak: 'break-word'}}>
           Connected as {user ? user.user.sub : profile?.name ? profile.name : coinbase ? coinbase : "Guest"}
-        </Paragraph>
-        <Paragraph style={{wordBreak: 'break-word'}}>
+        </Paragraph> */}
+        {/* <Paragraph style={{wordBreak: 'break-word'}}>
           ChainId: {netId}
-        </Paragraph>
+        </Paragraph> */}
 
         {
           uri &&
@@ -687,13 +693,15 @@ export default function App() {
           {
             coinbase && !user && !profile &&
             <Tab title="Use Wallet">
-              <Text>IPFS Hash</Text>
+              <br></br>
+              <Text><center>Enter IPFS Hash</center></Text>
               <TextInput onChange={event => setUri(event.target.value)}/>
             </Tab>
           }
           {
             coinbase && !user &&
             <Tab title="Use NFT">
+              <br></br>
               <ConnectNFTSection
                  client={client}
                  loadingMyNFTs={loadingMyNFTs}
@@ -707,6 +715,7 @@ export default function App() {
           {
             self && !user &&
             <Tab title="Use Profile">
+              <br></br>
               {
                 uri !== self.id &&
                 <Button secondary label="Set Profile URI" onClick={() => setUri(self.id)} />
@@ -751,6 +760,31 @@ export default function App() {
             </Tab>
           }
         </Tabs>
+      
+        <Paragraph className='inst_text'>
+        <Accordion>
+        <AccordionPanel label="How to play?">
+        <Box direction="row">
+                <img className='inst_image' src="img/instructions.png"></img><br/>
+                <div style={
+                  {
+                    marginLeft:"10px"
+                  }
+                }>Use <span>W-A-S-D</span> to move<br/><br/>
+                <span>SPACE</span> to jump<br/><br/>
+                <span>MOUSE</span> to look around<br/><br/>
+                {
+                  coinbase &&
+                  <>
+                  and <span>P</span> to occupy
+                  </>
+                }
+                </div>
+              </Box>
+        </AccordionPanel>
+      </Accordion>
+
+        </Paragraph>
       </Box>
     </Box>
     <Box id="canvas-container" align="center">
