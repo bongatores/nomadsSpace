@@ -46,6 +46,9 @@ const getActions = (setState) => ({
   setCoinbase: (coinbase) => {
     setState((state) => ({ ...state, coinbase: coinbase }))
   },
+  setSelf: (self) => {
+    setState((state) => ({ ...state, self: self }))
+  },
   setProfile: (profile) => {
     setState((state) => ({ ...state, profile: profile }))
   },

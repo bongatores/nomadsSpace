@@ -1,7 +1,5 @@
 import {useState,useEffect} from 'react';
 import {
-  Accordion,
-  AccordionPanel,
   Button,
   Header,
   Heading,
@@ -30,6 +28,12 @@ import authenticateWithEthereum from './hooks/useSelfID.js';
 
 import Game from './Game';
 
+import MainHeader from './components/MainHeader';
+import GameHeader from './components/GameHeader';
+import Instructions from './components/Instructions';
+
+import UseWalletSection from './components/UseWalletSection';
+import UseSelfIdSection from './components/UseSelfIdSection';
 import ConnectNFTSection from './components/ConnectNFTSection';
 
 
@@ -127,6 +131,7 @@ export default function App() {
     actions.setProfile(profile);
     actions.setUser(user);
     actions.setUri(uri);
+    actions.setSelf(self);
     actions.setGameContract(gameContract);
   },[
     coinbase,
@@ -189,79 +194,20 @@ export default function App() {
     <AppContext.Provider value={{ state, actions }}>
       <Game />
       <Box id="blocker">
-        <Header background="brand" align="start" className='navbar'>
-          <Heading className='heading' margin="small">EMPTY Space</Heading>
-          <Box align="end" pad="small" alignContent="center" >
-            {
-              coinbase ?
-              <Button onClick={() => {
-                logoutOfWeb3Modal();
-                setSelf();
-                setProfile();
-              }} label="Disconnect" /> :
-              <Button primary onClick={loadWeb3Modal} label="Connect Wallet" />
-            }
-            {
-              netId && coinbase &&
-              <Text size="xsmall" alignSelf="center" alignContent="center">
-                ChainId: {netId}
-                <br/>
-                Connected as: {user ? user.user.sub : profile?.name ? profile.name : coinbase ? coinbase : "Guest"}
-              </Text>
-            }
-          </Box>
-        </Header>
+        <MainHeader
+          loadWeb3Modal={loadWeb3Modal}
+          logoutOfWeb3Modal={logoutOfWeb3Modal}
+          setSelf={setSelf}
+          setProfile={setProfile}
+        />
         <Box align="center" className='menu_box'>
-          <Heading className='inst_head'>Welcome to <br/><span style={
-            {
-              fontFamily: 'franchise',
-              fontSize: '100px',
-              marginTop:'5px',
-              display:'block',
-            }
-          }>Empty Space</span></Heading>
-          <p style={
-            {
-              textAlign: 'center'
-            }
-          }>
-            A game where every space is your space until it's not. <br/>
-            Start playing now!
-          </p>
-
-          <Box direction="row" style={
-            {
-              marginBottom: '15px'
-            }
-          }>
-            <Button primary label="Click to play" id="instructions" />
-            {
-              !coinbase ?
-              <Button onClick={loadWeb3Modal} label="Connect wallet" /> :
-              !self &&
-              window.ethereum &&
-              <Button onClick={async () => {
-                const newSelf = await authenticateWithEthereum(coinbase);
-                const newProfile = await newSelf.get('basicProfile');
-                setSelf(newSelf);
-                setProfile(newProfile);
-                setUri(newSelf.id);
-              }} label="Connect ceramic" />
-            }
-          </Box>
-          {/* <Paragraph style={{wordBreak: 'break-word'}}>
-            Connected as {user ? user.user.sub : profile?.name ? profile.name : coinbase ? coinbase : "Guest"}
-          </Paragraph> */}
-          {/* <Paragraph style={{wordBreak: 'break-word'}}>
-            ChainId: {netId}
-          </Paragraph> */}
-
-          {
-            uri &&
-            <Paragraph style={{wordBreak: 'break-word'}}>
-              URI: {uri}
-            </Paragraph>
-          }
+          <GameHeader
+            loadWeb3Modal={loadWeb3Modal}
+            logoutOfWeb3Modal={logoutOfWeb3Modal}
+            setSelf={setSelf}
+            setProfile={setProfile}
+            setUri={setUri}
+          />
           <Tabs>
             {
               /*
@@ -274,9 +220,7 @@ export default function App() {
             {
               coinbase && !user && !profile &&
               <Tab title="Use Wallet">
-                <br></br>
-                <Text><center>Enter IPFS Hash</center></Text>
-                <TextInput onChange={event => setUri(event.target.value)}/>
+                <UseWalletSection setUri={setUri} />
               </Tab>
             }
             {
@@ -296,76 +240,23 @@ export default function App() {
             {
               self && !user &&
               <Tab title="Use Profile">
-                <br></br>
-                {
-                  uri !== self.id &&
-                  <Button secondary label="Set Profile URI" onClick={() => setUri(self.id)} />
-                }
-                <Box  direction="row">
-                  <Box>
-                    <Heading level="2">Edit Profile</Heading>
-                    <Text>Name</Text>
-                    <TextInput value={name} onChange={event => setName(event.target.value)}/>
-                    <Text>Description</Text>
-                    <TextInput  value={description} onChange={event => setDescription(event.target.value)}/>
-                    <Text>Image</Text>
-                    <TextInput  value={img} onChange={event => setImg(event.target.value)}/>
-                    <Text>URL</Text>
-                    <TextInput  value={url} onChange={event => setUrl(event.target.value)}/>
-                    <Text>Scenario</Text>
-                    <TextInput  value={scenario} onChange={event => setScenario(event.target.value)}/>
-                    <Button secondary label="Save Profile" onClick={async () => {
-                      console.log(img)
-                      await self.merge('basicProfile',{
-                        name: name,
-                        description: description,
-                        //image: makeBlockie(self.id),
-                        url: url,
-                        scenario: scenario
-                      });
-                      const newProfile = await self.get('basicProfile');
-                      setProfile(newProfile);
-                      console.log("Profile Saved")
-                    }} />
-                  </Box>
-                  <Box>
-                    <Heading level="2">Actual Profile</Heading>
-                    <Text>Name: {profile?.name}</Text>
-                    <Text>Description: {profile?.description}</Text>
-                    <Text>Image: {profile?.image}</Text>
-                    <Text>URL: {profile?.url}</Text>
-                    <Text>Scenario: {profile?.scenario}</Text>
-
-                  </Box>
-                </Box>
+                <UseSelfIdSection
+                  setName={setName}
+                  setDescription={setDescription}
+                  setImg={setImg}
+                  setUrl={setUrl}
+                  setScenario={setScenario}
+                  name={name}
+                  description={description}
+                  url={url}
+                  scenario={scenario}
+                  setUri={setUri}
+                  setProfile={setProfile}
+                />
               </Tab>
             }
           </Tabs>
-
-          <Paragraph className='inst_text'>
-          <Accordion>
-          <AccordionPanel label="How to play?">
-          <Box direction="row">
-                  <img className='inst_image' src="img/instructions.png"></img><br/>
-                  <div style={
-                    {
-                      marginLeft:"10px"
-                    }
-                  }>Use <span>W-A-S-D</span> to move<br/><br/>
-                  <span>SPACE</span> to jump<br/><br/>
-                  <span>MOUSE</span> to look around<br/><br/>
-                  {
-                    coinbase &&
-                    <>
-                    and <span>P</span> to occupy
-                    </>
-                  }
-                  </div>
-                </Box>
-          </AccordionPanel>
-        </Accordion>
-
-          </Paragraph>
+          <Instructions />
         </Box>
       </Box>
       <Box id="canvas-container" align="center">
