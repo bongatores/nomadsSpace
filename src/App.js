@@ -215,6 +215,7 @@ export default function App() {
           const erc721Tokens = ownedNfts.data.accounts[0].ERC721tokens;
           promises = erc721Tokens.map(getMetadata);
           const newMyOwnedNfts = await Promise.all(promises)
+
           setMyOwnedNfts(newMyOwnedNfts);
         }
 
@@ -238,24 +239,26 @@ export default function App() {
 
         await ENSInstance.setProvider(provider)
 
-        console.log("ENSInstance", ENSInstance);
+        const myENS = [];
 
-        const resolver = await provider.getResolver('test1emptyspace.eth');
-        const contentHash = await resolver.getContentHash();
+        for (let i = 0; i < listOfOwnedDomains.length; i++) {
 
-        console.log("Content hash", contentHash);
+          let domainName = listOfOwnedDomains[i].name;
+          let resolver = await provider.getResolver(domainName);
+          let contentHash = await resolver.getContentHash();
 
+          let newENS = {
+            domainName: domainName,
+            contentHash: contentHash
+          }
 
-        if (listOfOwnedDomains != 0) {
-
-
-
+          myENS.push(newENS)
         }
-        console.log("Fetching ENS...");
 
+        console.log(myENS);
 
+        setMyOwnedENS(myENS);
 
-        console.log("ownedENS", ownedENS);
         setLoadingMyENS(false);
       }
       catch (err) {
@@ -797,17 +800,19 @@ export default function App() {
                 />
               </Tab>
             }
+            {
+              coinbase && !user &&
+              <Tab title="Use ENS">
+                <br></br>
+                <ConnectENSSection
+                  client={client}
+                  loadingMyENS={loadingMyENS}
+                  myOwnedENS={myOwnedENS}
+                />
+              </Tab>
+            }
 
-            <Tab title="Use ENS">
-              <br></br>
-              <ConnectENSSection
-                client={client}
-                loadingMyNFTs={loadingMyNFTs}
-                myOwnedERC1155={myOwnedERC1155}
-                myOwnedNfts={myOwnedNfts}
-                setMetadata={setUri}
-              />
-            </Tab>
+
 
             {
               self && !user &&
