@@ -2,7 +2,6 @@ import React from 'react'
 import {
     Button,
     Box,
-    Heading,
     Image,
     Paragraph,
     Card,
@@ -27,7 +26,7 @@ export default function MyENS(props) {
 
                                 let uri = obj.contentHash
 
-                                uri = uri.replace("ipfs://", "https://ipfs.io/ipfs/");
+                                uri = uri?.replace("ipfs://", "https://ipfs.io/ipfs/");
 
                                 console.log("####URI", uri);
 
@@ -41,7 +40,7 @@ export default function MyENS(props) {
                                         <CardFooter pad={{ horizontal: "small" }} background="light-2" align="center" alignContent="center">
                                             <Button secondary onClick={() => {
                                                 console.log(obj.contentHash);
-                                                props.setMetadata(obj.contentHash)
+                                                props.setMetadata(obj.domainName)
                                             }} size="small" label="Select" />
                                         </CardFooter>
                                     </Card>

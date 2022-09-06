@@ -1,14 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
-import * as THREE from 'three';
+import { useState, useEffect } from 'react';
 
 import {
-  Button,
-  Header,
-  Heading,
   Box,
-  Paragraph,
-  TextInput,
-  Text,
   Tab,
   Tabs
 } from 'grommet';
@@ -19,15 +12,12 @@ import { ENS } from '@ensdomains/ensjs'
 import addresses from "./contracts/addresses";
 import abis from "./contracts/abis";
 
-import { Core } from '@self.id/core'
 
 import { AppContext, useAppState } from './hooks/useAppState'
 
 import useWeb3Modal from './hooks/useWeb3Modal'
 import useClient from './hooks/useGraphClient';
 
-
-import authenticateWithEthereum from './hooks/useSelfID.js';
 
 import Game from './Game';
 
@@ -171,7 +161,7 @@ export default function App() {
       newGameContract = new ethers.Contract(addresses.game.mumbai, abis.game, provider);
     }
     setGameContract(newGameContract);
-    
+
   },[netId,provider])
 
   useEffect(async () => {
@@ -316,6 +306,19 @@ export default function App() {
                    myOwnedERC1155={myOwnedERC1155}
                    myOwnedNfts={myOwnedNfts}
                    setMetadata={setUri}
+                />
+              </Tab>
+            }
+
+            {
+              coinbase && !user && myOwnedENS?.length > 0 &&
+              <Tab title="Use ENS">
+                <br></br>
+                <ConnectENSSection
+                  client={client}
+                  loadingMyENS={loadingMyENS}
+                  myOwnedENS={myOwnedENS}
+                  setMetadata={setUri}
                 />
               </Tab>
             }

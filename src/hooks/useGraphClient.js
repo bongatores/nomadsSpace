@@ -87,7 +87,7 @@ function useGraphClient() {
         cache: new InMemoryCache()
       });
       newENSClient = new ApolloClient({
-        uri: ENS_ETH,
+        uri: ENS_GOERLI,
         cache: new InMemoryCache()
       })
     }
