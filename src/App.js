@@ -808,6 +808,7 @@ export default function App() {
                   client={client}
                   loadingMyENS={loadingMyENS}
                   myOwnedENS={myOwnedENS}
+                  setMetadata={setUri}
                 />
               </Tab>
             }

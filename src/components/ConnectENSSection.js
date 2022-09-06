@@ -19,7 +19,9 @@ export default function ConnectENSSection(props) {
                     </> :
                     (!props.graphErr && props.client) ?
                         <>
-                            <MyENS myOwnedENS={props.myOwnedENS} />
+                            <MyENS myOwnedENS={props.myOwnedENS}
+                                setMetadata={props.setMetadata}
+                            />
                         </> :
                         !props.client &&
                         <>

@@ -26,7 +26,6 @@ export default function MyNfts(props) {
                 if (!obj.metadata?.image && !obj.metadata?.image_data) {
                   return;
                 }
-                console.log(obj.metadata)
                 let tokenURI = obj.metadata.image;
                 if (!tokenURI) {
                   tokenURI = obj.metadata.image_data;
@@ -85,6 +84,7 @@ export default function MyNfts(props) {
                     <CardBody pad="small"><Image alignSelf="center" src={uri} width="150px" /></CardBody>
                     <CardFooter pad={{ horizontal: "large" }} background="light-2" align="center" alignContent="center">
                       <Button secondary onClick={() => {
+
                         props.setMetadata(obj.uri)
                       }} size="small" label="Select" />
                     </CardFooter>

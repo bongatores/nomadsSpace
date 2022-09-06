@@ -40,7 +40,8 @@ export default function MyENS(props) {
                                         <CardBody pad="small"><Image alignSelf="center" src={uri} width="150px" /></CardBody>
                                         <CardFooter pad={{ horizontal: "small" }} background="light-2" align="center" alignContent="center">
                                             <Button secondary onClick={() => {
-                                                props.setMetadata(obj.uri)
+                                                console.log(obj.contentHash);
+                                                props.setMetadata(obj.contentHash)
                                             }} size="small" label="Select" />
                                         </CardFooter>
                                     </Card>
