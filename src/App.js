@@ -149,8 +149,13 @@ export default function App() {
   ]);
   useEffect(() => {
     initiateClient(netId);
-    actions.setNetId(netId);
   },[netId]);
+
+  useEffect(() => {
+    if(!coinbase && !profile && !user){
+      setUri();
+    }
+  },[coinbase,profile,user]);
 
   useEffect(() => {
     let newGameContract;
@@ -288,6 +293,7 @@ export default function App() {
             <MyUNS
               setMetadata={setUri}
             /> :
+            coinbase &&
             <Tabs>
               {
                 /*
@@ -298,13 +304,13 @@ export default function App() {
                 */
               }
               {
-                coinbase && !profile &&
+                !profile &&
                 <Tab title="Use Wallet">
                   <UseWalletSection setUri={setUri} />
                 </Tab>
               }
               {
-                coinbase &&
+                (myOwnedERC1155?.length > 0 || myOwnedNfts?.length > 0) &&
                 <Tab title="Use NFT">
                   <br></br>
                   <ConnectNFTSection
@@ -318,7 +324,7 @@ export default function App() {
               }
 
               {
-                coinbase && myOwnedENS?.length > 0 &&
+                myOwnedENS?.length > 0 &&
                 <Tab title="Use ENS">
                   <br></br>
                   <ConnectENSSection

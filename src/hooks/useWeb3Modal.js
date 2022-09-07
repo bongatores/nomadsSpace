@@ -54,7 +54,6 @@ const web3Modal = new Web3Modal({
 });
 // Register the web3modal so the connector has access to it.
 UAuthWeb3Modal.registerWeb3Modal(web3Modal)
-export {web3Modal,uauthOptions};
 
 function useWeb3Modal(config = {}) {
   const [provider, setProvider] = useState(new ethers.providers.JsonRpcProvider("https://rpc-mumbai.maticvigil.com"));
@@ -70,10 +69,15 @@ function useWeb3Modal(config = {}) {
   // You can see other options at https://github.com/Web3Modal/web3modal
   const logoutOfWeb3Modal = useCallback(
     async function () {
+      if (web3Modal.cachedProvider === 'custom-uauth') {
+        const uauth = await UAuthWeb3Modal.getUAuth(UAuthSPA, uauthOptions);
+        await uauth.logout()
+      }
       await web3Modal.clearCachedProvider();
       setCoinbase();
       setNetId(80001);
       setProvider(new ethers.providers.JsonRpcProvider("https://rpc-mumbai.maticvigil.com"));
+      setUser();
     },
     [],
   );
