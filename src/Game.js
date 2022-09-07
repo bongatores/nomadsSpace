@@ -197,25 +197,25 @@ export default function Game() {
           const records = await resolution.records(
             uriGame,
             [
-              "social.name.value",
-              "social.description.value",
+              "profile.name.value",
+              "profile.description.value",
               "ipfs.html.value",
-              "social.image.value",
-              "social.gltf.value"
+              "profile.image.value",
+              "emptyspace.gltf.value"
             ]
           );
           console.log(records)
           console.log(`Domain ${uriGame} ipfs hash is: ${records["ipfs.html.value"]}`);
           metadata = {
-            name: records["social.name.value"] ?
-                  records["social.name.value"] :
+            name: records["profile.name.value"] ?
+                  records["profile.name.value"] :
                   uriGame,
-            description: records["social.description.value"],
-            image: records["social.image.value"] ?
-                   records["social.image.value"] :
+            description: records["profile.description.value"],
+            image: records["profile.image.value"] ?
+                   records["profile.image.value"] :
                    `https://metadata.unstoppabledomains.com/image-src/${uriGame}.svg`,
             external_url: records["ipfs.html.value"],
-            scenario: records["social.gltf.value"]
+            scenario: records["emptyspace.gltf.value"]
           }
         } else {
           // Assumes it is nft metadata

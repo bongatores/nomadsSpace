@@ -293,7 +293,7 @@ export default function App() {
             <MyUNS
               setMetadata={setUri}
             /> :
-            coinbase &&
+            coinbase && !self &&
             <Tabs>
               {
                 /*
@@ -336,27 +336,20 @@ export default function App() {
                 </Tab>
               }
 
-              {
-                self &&
-                <Tab title="Use Profile">
-                  <UseSelfIdSection
-                    setName={setName}
-                    setDescription={setDescription}
-                    setImg={setImg}
-                    setUrl={setUrl}
-                    setScenario={setScenario}
-                    name={name}
-                    description={description}
-                    url={url}
-                    scenario={scenario}
-                    setUri={setUri}
-                    setProfile={setProfile}
-                  />
-                </Tab>
-              }
             </Tabs>
           }
-
+          {
+            self &&
+            <UseSelfIdSection
+              setName={setName}
+              setDescription={setDescription}
+              setImg={setImg}
+              setUrl={setUrl}
+              setScenario={setScenario}
+              setUri={setUri}
+              setProfile={setProfile}
+            />
+          }
           <Instructions />
         </Box>
       </Box>

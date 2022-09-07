@@ -1,40 +1,98 @@
-import React from 'react'
+import React,{useState,useEffect} from 'react'
 import {
   Button,
   Heading,
   Box,
   TextInput,
-  Text
+  Text,
+  FileInput,
+  Accordion,
+  AccordionPanel,
+  Spinner
  } from 'grommet';
 
 import { useAppContext } from '../hooks/useAppState'
+import { NFTStorage } from 'nft.storage'
+
+const fr = new FileReader();
+const client = new NFTStorage({ token: process.env.REACT_APP_NFT_STORAGE_API })
 
 
 export default function UseSelfIdSection(props){
 
   const { state } = useAppContext();
 
+  const [file,setFile] = useState();
+  const [files,setFiles] = useState();
+  const [uploading,setUploading] = useState();
+  const [image,setImage] = useState();
+
+  useEffect(() => {
+    fr.addEventListener('progress', event => {setUploading(true)});
+    fr.addEventListener('load', async event => {
+      const img = event.target.result;
+      setImage(img);
+      setUploading(false)
+    });
+  },[])
+
+  useEffect(() => {
+    if(file){
+      fr.readAsArrayBuffer(file)
+    }
+  },[file])
+
+
   return(
     <>
-    <br></br>
     {
-      state.uri !== state.self.id &&
-      <Button secondary label="Set Profile URI" onClick={() => props.setUri(state.self.id)} />
+      uploading &&
+      <Spinner />
     }
-    <Box  direction="row" style={{wordBreak: 'break-word'}}>
-      <Box>
-        <Heading level="2">Edit Profile</Heading>
+    <Accordion>
+    <AccordionPanel label="Edit Profile">
+      <Box style={{wordBreak: 'break-word'}}>
         <Text>Name</Text>
-        <TextInput value={props.name} onChange={event => props.setName(event.target.value)}/>
+        <TextInput value={state.profile?.name} onChange={event => props.setName(event.target.value)}/>
         <Text>Description</Text>
-        <TextInput  value={props.description} onChange={event => props.setDescription(event.target.value)}/>
+        <TextInput  value={state.profile?.description} onChange={event => props.setDescription(event.target.value)}/>
         <Text>Image</Text>
-        <TextInput  value={props.img} onChange={event => props.setImg(event.target.value)}/>
+        <FileInput
+          name="Image"
+          accept="image/*"
+          onChange={event => {
+            const fileList = event.target.files;
+            setFile(fileList[0]);
+          }}
+        />
+        {
+          image &&
+          <Button secondary label="Upload Image to IPFS" size="xsmall" onClick={async () => {
+            console.log(image);
+            setUploading(true)
+            const storageRes = await NFTStorage.encodeBlob(new Blob(image));
+            const cidNftStorageMetadata = await client.storeCar(storageRes.car);
+            setUploading(true)
+          }} />
+        }
         <Text>URL</Text>
-        <TextInput  value={props.url} onChange={event => props.setUrl(event.target.value)}/>
+        <TextInput  value={state.profile?.url} onChange={event => props.setUrl(event.target.value)}/>
         <Text>Scenario</Text>
-        <TextInput  value={props.scenario} onChange={event => props.setScenario(event.target.value)}/>
+        <FileInput
+          name="Scenario"
+          onChange={event => {
+            const fileList = event.target.files;
+            setFiles(fileList[0]);
+          }}
+        />
+        {
+          files &&
+          <Button secondary label="Upload Scenario to IPFS" size="xsmall" onClick={async () => {
+            console.log(files)
+          }} />
+        }
         <Button secondary label="Save Profile" onClick={async () => {
+          setUploading(true);
           console.log(props.img)
           await state.self.merge('basicProfile',{
             name: props.name,
@@ -47,17 +105,24 @@ export default function UseSelfIdSection(props){
           props.setProfile(newProfile);
           props.setUri(state.self.id)
           console.log("Profile Saved")
+          setUploading(false);
         }} />
       </Box>
-      <Box>
-        <Heading level="2">Actual Profile</Heading>
-        <Text>Name: {state.profile?.name}</Text>
-        <Text>Description: {state.profile?.description}</Text>
-        <Text>Image: {state.profile?.image}</Text>
-        <Text>URL: {state.profile?.url}</Text>
-        <Text>Scenario: {state.profile?.scenario}</Text>
-      </Box>
+    </AccordionPanel>
+    <Box style={{wordBreak: 'break-word'}}>
+      <Heading level="4">Actual Profile</Heading>
+      {
+        state.uri !== state.self?.id &&
+        <Button secondary label="Set Profile URI" onClick={() => props.setUri(state.self.id)} />
+      }
+      <Text>Name: {state.profile?.name}</Text>
+      <Text>Description: {state.profile?.description}</Text>
+      <Text>Image: {state.profile?.image}</Text>
+      <Text>URL: {state.profile?.url}</Text>
+      <Text>Scenario: {state.profile?.scenario}</Text>
+
     </Box>
+    </Accordion>
     </>
   )
 }
