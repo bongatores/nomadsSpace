@@ -1,6 +1,7 @@
 import {useEffect,useRef} from 'react'
 import * as THREE from 'three';
 import makeBlockie from 'ethereum-blockies-base64';
+import { ethers } from "ethers";
 
 import SpriteText from 'three-spritetext';
 
@@ -8,6 +9,7 @@ import SpriteText from 'three-spritetext';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls'
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 //import { AmmoPhysics } from 'three/addons/physics/AmmoPhysics.js';
+import Resolution from '@unstoppabledomains/resolution';
 
 
 import { Core } from '@self.id/core'
@@ -16,6 +18,8 @@ import { useAppContext } from './hooks/useAppState'
 
 
 const core = new Core({ ceramic: 'testnet-clay' })
+
+const resolution = Resolution.fromEthersProvider(new ethers.providers.JsonRpcProvider("https://rpc-mainnet.maticvigil.com"));
 
 
 export default function Game() {
@@ -172,6 +176,7 @@ export default function Game() {
         const gameInfo = new THREE.Group()
         const uriGame = await contract.uri();
         let metadata;
+        console.log(uriGame)
         if(uriGame.includes("did")){
           // Get profile info from ceramic.network
           const userProfile = await core.get('basicProfile',uriGame);
@@ -186,6 +191,31 @@ export default function Game() {
                    makeBlockie(uriGame),
             external_url: userProfile.url,
             scenario: userProfile.scenario
+          }
+        } else if(uriGame.includes('.crypto')){
+          // UNS domain
+          const records = await resolution.records(
+            uriGame,
+            [
+              "social.name.value",
+              "social.description.value",
+              "ipfs.html.value",
+              "social.image.value",
+              "social.gltf.value"
+            ]
+          );
+          console.log(records)
+          console.log(`Domain ${uriGame} ipfs hash is: ${records["ipfs.html.value"]}`);
+          metadata = {
+            name: records["social.name.value"] ?
+                  records["social.name.value"] :
+                  uriGame,
+            description: records["social.description.value"],
+            image: records["social.image.value"] ?
+                   records["social.image.value"] :
+                   `https://metadata.unstoppabledomains.com/image-src/${uriGame}.svg`,
+            external_url: records["ipfs.html.value"],
+            scenario: records["social.gltf.value"]
           }
         } else {
           // Assumes it is nft metadata

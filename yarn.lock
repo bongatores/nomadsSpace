@@ -3744,7 +3744,7 @@
   resolved "https://registry.yarnpkg.com/@uauth/web3modal/-/web3modal-2.2.0.tgz#1c8c2d76c8a4d018bef6de5242c35bc50f9b8b85"
   integrity sha512-PolkMAE/WFOp7en1nzZF/bvt5aM8rDmUEPoTOi0ElY+wz4L11+5eWUQBsIyRmH2we4S1w37zS6DM3AkYirFRZQ==
 
-"@unstoppabledomains/resolution@^8.0":
+"@unstoppabledomains/resolution@^8.0", "@unstoppabledomains/resolution@^8.3.3":
   version "8.3.3"
   resolved "https://registry.yarnpkg.com/@unstoppabledomains/resolution/-/resolution-8.3.3.tgz#599c5e2f068a36e24bd19c0f9e2f753036264a3b"
   integrity sha512-jQ9757Lvx/xqU7Lg7JT4L9WQZuElHkMiJmtph0e6TSwfguIlkv1i5UgzURgVXDvVizVKpDejGS60kuvICkz9ZQ==
