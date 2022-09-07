@@ -29,6 +29,7 @@ import UseWalletSection from './components/UseWalletSection';
 import UseSelfIdSection from './components/UseSelfIdSection';
 import ConnectNFTSection from './components/ConnectNFTSection';
 import ConnectENSSection from './components/ConnectENSSection';
+import MyUNS from './components/MyUNS';
 
 
 export default function App() {
@@ -165,7 +166,7 @@ export default function App() {
   },[netId,provider])
 
   useEffect(async () => {
-    if (client && coinbase && netId) {
+    if (client && coinbase && netId && !user) {
       try {
         const ownedNfts = await getNftsFrom(coinbase, netId);
         console.log(ownedNfts)
@@ -192,6 +193,7 @@ export default function App() {
 
       try {
         const ownedENS = await getENSFrom(coinbase);
+        if(!ownedENS.data.account) return
         const listOfOwnedDomains = ownedENS.data.account.domains
 
         console.log(listOfOwnedDomains)
@@ -228,7 +230,7 @@ export default function App() {
 
 
     }
-  }, [client, coinbase, netId]);
+  }, [client, coinbase, netId, user]);
 
 
   // const getENSFrom = async function (coinbase) {
@@ -281,67 +283,74 @@ export default function App() {
             setProfile={setProfile}
             setUri={setUri}
           />
-          <Tabs>
-            {
-              /*
-              <Tab title="Write message">
-                <Text>Message</Text>
-                <TextInput id="textInput"/>
-              </Tab>
-              */
-            }
-            {
-              coinbase && !user && !profile &&
-              <Tab title="Use Wallet">
-                <UseWalletSection setUri={setUri} />
-              </Tab>
-            }
-            {
-              coinbase && !user &&
-              <Tab title="Use NFT">
-                <br></br>
-                <ConnectNFTSection
-                   client={client}
-                   loadingMyNFTs={loadingMyNFTs}
-                   myOwnedERC1155={myOwnedERC1155}
-                   myOwnedNfts={myOwnedNfts}
-                   setMetadata={setUri}
-                />
-              </Tab>
-            }
+          {
+            user ?
+            <MyUNS
+              setMetadata={setUri}
+            /> :
+            <Tabs>
+              {
+                /*
+                <Tab title="Write message">
+                  <Text>Message</Text>
+                  <TextInput id="textInput"/>
+                </Tab>
+                */
+              }
+              {
+                coinbase && !profile &&
+                <Tab title="Use Wallet">
+                  <UseWalletSection setUri={setUri} />
+                </Tab>
+              }
+              {
+                coinbase &&
+                <Tab title="Use NFT">
+                  <br></br>
+                  <ConnectNFTSection
+                     client={client}
+                     loadingMyNFTs={loadingMyNFTs}
+                     myOwnedERC1155={myOwnedERC1155}
+                     myOwnedNfts={myOwnedNfts}
+                     setMetadata={setUri}
+                  />
+                </Tab>
+              }
 
-            {
-              coinbase && !user && myOwnedENS?.length > 0 &&
-              <Tab title="Use ENS">
-                <br></br>
-                <ConnectENSSection
-                  client={client}
-                  loadingMyENS={loadingMyENS}
-                  myOwnedENS={myOwnedENS}
-                  setMetadata={setUri}
-                />
-              </Tab>
-            }
+              {
+                coinbase && myOwnedENS?.length > 0 &&
+                <Tab title="Use ENS">
+                  <br></br>
+                  <ConnectENSSection
+                    client={client}
+                    loadingMyENS={loadingMyENS}
+                    myOwnedENS={myOwnedENS}
+                    setMetadata={setUri}
+                  />
+                </Tab>
+              }
 
-            {
-              self && !user &&
-              <Tab title="Use Profile">
-                <UseSelfIdSection
-                  setName={setName}
-                  setDescription={setDescription}
-                  setImg={setImg}
-                  setUrl={setUrl}
-                  setScenario={setScenario}
-                  name={name}
-                  description={description}
-                  url={url}
-                  scenario={scenario}
-                  setUri={setUri}
-                  setProfile={setProfile}
-                />
-              </Tab>
-            }
-          </Tabs>
+              {
+                self &&
+                <Tab title="Use Profile">
+                  <UseSelfIdSection
+                    setName={setName}
+                    setDescription={setDescription}
+                    setImg={setImg}
+                    setUrl={setUrl}
+                    setScenario={setScenario}
+                    name={name}
+                    description={description}
+                    url={url}
+                    scenario={scenario}
+                    setUri={setUri}
+                    setProfile={setProfile}
+                  />
+                </Tab>
+              }
+            </Tabs>
+          }
+
           <Instructions />
         </Box>
       </Box>

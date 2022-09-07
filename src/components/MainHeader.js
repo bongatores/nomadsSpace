@@ -33,7 +33,7 @@ export default function MainHeader(props){
             ChainId: {state.netId}
             <br/>
             Connected as: {
-              state.user ? state.user.user.sub :
+              state.user ? state.user.sub :
               state.profile?.name ? state.profile.name :
               state.coinbase ? state.coinbase :
               "Guest"

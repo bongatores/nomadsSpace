@@ -3,7 +3,6 @@ import {
   Heading,
   Box,
   Paragraph,
-  Text
  } from 'grommet';
 
 import { useAppContext } from '../hooks/useAppState'
@@ -45,6 +44,7 @@ export default function GameHeader(props){
         !state.coinbase ?
         <Button onClick={props.loadWeb3Modal} label="Connect wallet" /> :
         !state.self &&
+        !state.user &&
         window.ethereum &&
         <Button onClick={async () => {
           const newSelf = await authenticateWithEthereum(state.coinbase);

@@ -3,17 +3,16 @@ import { ethers } from "ethers";
 import Web3Modal from "web3modal";
 import * as UAuthWeb3Modal from '@uauth/web3modal'
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import UAuthSPA from '@uauth/js';
+import UAuth from '@uauth/js'
+import UAuthSPA from '@uauth/js'
 
 // UNS Login Integration
 // These options are used to construct the UAuthSPA instance.
-const uauthOptions: IUAuthOptions = {
-  clientID: process.env.REACT_APP_UNS_ID,
-  redirectUri: process.env.REACT_APP_UNS_REDIRECT,
-  //redirectUri: 'http://127.0.0.1:3000',
-  // Must include both the openid and wallet scopes.
-  scope: 'openid wallet',
-}
+const uauthOptions = {
+    clientID: process.env.REACT_APP_UNS_ID,
+    redirectUri: process.env.REACT_APP_UNS_REDIRECT,
+    scope: "openid wallet"
+  }
 
 const providerOptions = {
 
@@ -96,7 +95,7 @@ function useWeb3Modal(config = {}) {
       setNoProvider(true);
       setConnecting(false);
       // UNS User
-      new UAuthSPA(uauthOptions).user().then(async user => {
+      new UAuth(uauthOptions).user().then(async user => {
         console.log(user)
         setUser(user);
       }).catch(err => {

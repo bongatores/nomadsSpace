@@ -28,8 +28,14 @@ function useGraphClient() {
   const [ensClient, setENSClient] = useState();
   const initiateClient = (netId) => {
     //if(!client && netId){
-    let newClient;
-    let newENSClient;
+    let newClient = new ApolloClient({
+      uri: APIURL_GOERLI,
+      cache: new InMemoryCache()
+    });
+    let newENSClient = new ApolloClient({
+      uri: ENS_GOERLI,
+      cache: new InMemoryCache()
+    });
     if (netId === 1) {
       newClient = new ApolloClient({
         uri: APIURL_ETH,
