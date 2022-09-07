@@ -137,7 +137,7 @@ export default function App() {
     actions.setUri(uri);
     actions.setSelf(self);
     actions.setGameContract(gameContract);
-  },[
+  }, [
     coinbase,
     provider,
     netId,
@@ -149,13 +149,13 @@ export default function App() {
   ]);
   useEffect(() => {
     initiateClient(netId);
-  },[netId]);
+  }, [netId]);
 
   useEffect(() => {
-    if(!coinbase && !profile && !user){
+    if (!coinbase && !profile && !user) {
       setUri();
     }
-  },[coinbase,profile,user]);
+  }, [coinbase, profile, user]);
 
   useEffect(() => {
     let newGameContract;
@@ -168,7 +168,7 @@ export default function App() {
     }
     setGameContract(newGameContract);
 
-  },[netId,provider])
+  }, [netId, provider])
 
   useEffect(async () => {
     if (client && coinbase && netId && !user) {
@@ -198,24 +198,40 @@ export default function App() {
 
       try {
         const ownedENS = await getENSFrom(coinbase);
-        if(!ownedENS.data.account) return
+        if (!ownedENS.data.account) return
         const listOfOwnedDomains = ownedENS.data.account.domains
 
         console.log(listOfOwnedDomains)
 
-        await ENSInstance.setProvider(provider)
+        console.log("###", provider.network.chainId);
+
+        let providerENS;
+        if (provider.network.chainId != 4 && provider.network.chainId != 5) {
+          // Use rinkeby default network for networks that do not have ENS support PROOF OF CONCEPT
+          providerENS = new ethers.providers.JsonRpcProvider("https://rpc.ankr.com/eth_rinkeby")
+        }
+        else {
+          providerENS = provider;
+        }
+
+        console.log("###", providerENS);
 
         const myENS = [];
 
         for (let i = 0; i < listOfOwnedDomains.length; i++) {
 
           let domainName = listOfOwnedDomains[i].name;
-          let resolver = await provider.getResolver(domainName);
+          let resolver = await providerENS.getResolver(domainName);
           let contentHash = await resolver.getContentHash();
+
+          let scenario = await resolver.getText("scenario");
+          let avatar = await resolver.getText("avatar");
 
           let newENS = {
             domainName: domainName,
-            contentHash: contentHash
+            contentHash: contentHash,
+            scenario: scenario,
+            avatar: avatar
           }
 
           myENS.push(newENS)
@@ -290,53 +306,71 @@ export default function App() {
           />
           {
             user ?
-            <MyUNS
-              setMetadata={setUri}
-            /> :
-            coinbase && !self &&
-            <Tabs>
-              {
-                /*
-                <Tab title="Write message">
-                  <Text>Message</Text>
-                  <TextInput id="textInput"/>
-                </Tab>
-                */
-              }
-              {
-                !profile &&
-                <Tab title="Use Wallet">
-                  <UseWalletSection setUri={setUri} />
-                </Tab>
-              }
-              {
-                (myOwnedERC1155?.length > 0 || myOwnedNfts?.length > 0) &&
-                <Tab title="Use NFT">
-                  <br></br>
-                  <ConnectNFTSection
-                     client={client}
-                     loadingMyNFTs={loadingMyNFTs}
-                     myOwnedERC1155={myOwnedERC1155}
-                     myOwnedNfts={myOwnedNfts}
-                     setMetadata={setUri}
-                  />
-                </Tab>
-              }
+              <MyUNS
+                setMetadata={setUri}
+              /> :
+              coinbase &&
+              <Tabs>
+                {
+                  /*
+                  <Tab title="Write message">
+                    <Text>Message</Text>
+                    <TextInput id="textInput"/>
+                  </Tab>
+                  */
+                }
+                {
+                  !profile &&
+                  <Tab title="Use Wallet">
+                    <UseWalletSection setUri={setUri} />
+                  </Tab>
+                }
+                {
+                  (myOwnedERC1155?.length > 0 || myOwnedNfts?.length > 0) &&
+                  <Tab title="Use NFT">
+                    <br></br>
+                    <ConnectNFTSection
+                      client={client}
+                      loadingMyNFTs={loadingMyNFTs}
+                      myOwnedERC1155={myOwnedERC1155}
+                      myOwnedNfts={myOwnedNfts}
+                      setMetadata={setUri}
+                    />
+                  </Tab>
+                }
 
-              {
-                myOwnedENS?.length > 0 &&
-                <Tab title="Use ENS">
-                  <br></br>
-                  <ConnectENSSection
-                    client={client}
-                    loadingMyENS={loadingMyENS}
-                    myOwnedENS={myOwnedENS}
-                    setMetadata={setUri}
-                  />
-                </Tab>
-              }
+                {
+                  myOwnedENS?.length > 0 &&
+                  <Tab title="Use ENS">
+                    <br></br>
+                    <ConnectENSSection
+                      client={client}
+                      loadingMyENS={loadingMyENS}
+                      myOwnedENS={myOwnedENS}
+                      setMetadata={setUri}
+                    />
+                  </Tab>
+                }
 
-            </Tabs>
+                {
+                  self &&
+                  <Tab title="Use Profile">
+                    <UseSelfIdSection
+                      setName={setName}
+                      setDescription={setDescription}
+                      setImg={setImg}
+                      setUrl={setUrl}
+                      setScenario={setScenario}
+                      name={name}
+                      description={description}
+                      url={url}
+                      scenario={scenario}
+                      setUri={setUri}
+                      setProfile={setProfile}
+                    />
+                  </Tab>
+                }
+              </Tabs>
           }
           {
             self &&
