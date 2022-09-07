@@ -241,7 +241,6 @@ export default function Game() {
           console.log(records)
           console.log(`Domain ${uriGame} ipfs hash is: ${records["ipfs.html.value"]}`);
           metadata = {
-<<<<<<< HEAD
             name: records["profile.name.value"] ?
                   records["profile.name.value"] :
                   uriGame,
@@ -249,15 +248,6 @@ export default function Game() {
             image: records["profile.image.value"] ?
                    records["profile.image.value"] :
                    `https://metadata.unstoppabledomains.com/image-src/${uriGame}.svg`,
-=======
-            name: records["social.name.value"] ?
-              records["social.name.value"] :
-              uriGame,
-            description: records["social.description.value"],
-            image: records["social.image.value"] ?
-              records["social.image.value"] :
-              `https://metadata.unstoppabledomains.com/image-src/${uriGame}.svg`,
->>>>>>> 43ed95933f98978487e4546796e293b658249716
             external_url: records["ipfs.html.value"],
             scenario: records["emptyspace.gltf.value"]
           }
