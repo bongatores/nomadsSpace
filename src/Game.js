@@ -176,7 +176,7 @@ export default function Game() {
         const gameInfo = new THREE.Group()
         const uriGame = await contract.uri();
         let metadata;
-        if (uriGame.includes("did") && !uriGame.endsWith(".eth")) {
+        if (uriGame.startsWith("did:3")) {
           // Get profile info from ceramic.network
           const userProfile = await core.get('basicProfile', uriGame);
           if (!userProfile) {
@@ -226,7 +226,7 @@ export default function Game() {
         }
 
 
-        else if (uriGame.includes('.crypto')) {
+        else if (uriGame.endsWith('.crypto')) {
           // UNS domain
           const records = await resolution.records(
             uriGame,
