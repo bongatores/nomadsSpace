@@ -1,4 +1,4 @@
-import {useEffect,useRef} from 'react'
+import { useEffect, useRef } from 'react'
 import * as THREE from 'three';
 import makeBlockie from 'ethereum-blockies-base64';
 import { ethers } from "ethers";
@@ -7,7 +7,7 @@ import SpriteText from 'three-spritetext';
 
 
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls'
-import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 //import { AmmoPhysics } from 'three/addons/physics/AmmoPhysics.js';
 import Resolution from '@unstoppabledomains/resolution';
 
@@ -30,12 +30,12 @@ export default function Game() {
   const ref = useRef({});
 
   useEffect(() => {
-      init();
-      animate();
-  },[]);
+    init();
+    animate();
+  }, []);
   useEffect(() => {
     ref.current = state
-  },[state]);
+  }, [state]);
   let camera, scene, renderer, controls;
   const objects = [];
   let raycaster;
@@ -52,9 +52,9 @@ export default function Game() {
   const vertex = new THREE.Vector3();
   const color = new THREE.Color();
 
-  const onKeyDown = async function ( event ) {
+  const onKeyDown = async function (event) {
 
-    switch ( event.code ) {
+    switch (event.code) {
 
       case 'ArrowUp':
       case 'KeyW':
@@ -82,20 +82,20 @@ export default function Game() {
         const gameProvider = ref.current.provider;
         const sendingTxGame = ref.current.sendingTx;
         console.log(ref.current)
-        if(!sendingTxGame && coinbaseGame && contract){
+        if (!sendingTxGame && coinbaseGame && contract) {
           ref.current = {
             ...ref.current,
             sendingTx: true
           }
-          try{
-            let string =ref.current.uri;
+          try {
+            let string = ref.current.uri;
             console.log(string)
-            if(!string) return;
+            if (!string) return;
             const signer = gameProvider.getSigner();
             const gameContractWithSigner = contract.connect(signer);
             const tx = await gameContractWithSigner.requestRandomWords(string);
             await tx.wait();
-          } catch(err){
+          } catch (err) {
             console.log(err)
           }
           ref.current = {
@@ -107,7 +107,7 @@ export default function Game() {
         break;
 
       case 'Space':
-        if ( canJump === true ) velocity.y += 350;
+        if (canJump === true) velocity.y += 350;
         canJump = false;
         break;
 
@@ -115,9 +115,9 @@ export default function Game() {
 
   };
 
-  const onKeyUp = function ( event ) {
+  const onKeyUp = function (event) {
 
-    switch ( event.code ) {
+    switch (event.code) {
 
       case 'ArrowUp':
       case 'KeyW':
@@ -148,7 +148,7 @@ export default function Game() {
     const contractInitiated = ref.current?.contractInitiated;
     const contract = ref.current?.gameContract;
 
-    if(contract && !contractInitiated){ //&& coinbase){
+    if (contract && !contractInitiated) { //&& coinbase){
       try {
         /*
         for(let i = 0; i < 1999;i++){
@@ -176,23 +176,57 @@ export default function Game() {
         const gameInfo = new THREE.Group()
         const uriGame = await contract.uri();
         let metadata;
-        console.log(uriGame)
-        if(uriGame.includes("did")){
+        if (uriGame.includes("did") && !uriGame.endsWith(".eth")) {
           // Get profile info from ceramic.network
-          const userProfile = await core.get('basicProfile',uriGame);
-          if(!userProfile){
+          const userProfile = await core.get('basicProfile', uriGame);
+          if (!userProfile) {
             return
           }
           metadata = {
             name: userProfile.name ? userProfile.name : uriGame,
             description: userProfile.description,
             image: userProfile.image ?
-                   userProfile.image :
-                   makeBlockie(uriGame),
+              userProfile.image :
+              makeBlockie(uriGame),
             external_url: userProfile.url,
             scenario: userProfile.scenario
           }
-        } else if(uriGame.includes('.crypto')){
+        }
+        else if (uriGame.endsWith(".eth")) {
+
+          const provider = ref.current.provider;
+
+          let providerENS;
+          if (provider.network.chainId != 4 && provider.network.chainId != 5) {
+            // Use rinkeby default network for networks that do not have ENS support PROOF OF CONCEPT
+            providerENS = new ethers.providers.JsonRpcProvider("https://rpc.ankr.com/eth_rinkeby")
+          }
+          else {
+            providerENS = provider;
+          }
+
+
+          const resolver = await providerENS.getResolver(uriGame)
+
+          const scenario = await resolver.getText("scenario");
+          const avatar = await resolver.getText("avatar");
+
+          const description = await resolver.getText("description");
+
+          const url = await resolver.getText("url");
+
+          metadata = {
+            name: uriGame,
+            description: description,
+            image: avatar,
+            external_url: url,
+            scenario: scenario
+          }
+
+        }
+
+
+        else if (uriGame.includes('.crypto')) {
           // UNS domain
           const records = await resolution.records(
             uriGame,
@@ -208,27 +242,27 @@ export default function Game() {
           console.log(`Domain ${uriGame} ipfs hash is: ${records["ipfs.html.value"]}`);
           metadata = {
             name: records["social.name.value"] ?
-                  records["social.name.value"] :
-                  uriGame,
+              records["social.name.value"] :
+              uriGame,
             description: records["social.description.value"],
             image: records["social.image.value"] ?
-                   records["social.image.value"] :
-                   `https://metadata.unstoppabledomains.com/image-src/${uriGame}.svg`,
+              records["social.image.value"] :
+              `https://metadata.unstoppabledomains.com/image-src/${uriGame}.svg`,
             external_url: records["ipfs.html.value"],
             scenario: records["social.gltf.value"]
           }
         } else {
           // Assumes it is nft metadata
-          metadata = JSON.parse(await (await fetch(`https://nftstorage.link/ipfs/${uriGame.replace("ipfs://","")}`)).text());
+          metadata = JSON.parse(await (await fetch(`https://nftstorage.link/ipfs/${uriGame.replace("ipfs://", "")}`)).text());
         }
-        const imgTexture = new THREE.TextureLoader().load(metadata.image.replace("ipfs://","https://nftstorage.link/ipfs/"));
-        const material = new THREE.SpriteMaterial({ map: imgTexture});
+        const imgTexture = new THREE.TextureLoader().load(metadata.image.replace("ipfs://", "https://nftstorage.link/ipfs/"));
+        const material = new THREE.SpriteMaterial({ map: imgTexture });
         const sprite = new THREE.Sprite(material);
         console.log(metadata)
-        const name = new SpriteText(metadata.name,20,"red");
-        const description =  new SpriteText(metadata.description,10,"blue")
-        const external_url = new SpriteText(metadata.external_url,8,"green")
-        sprite.scale.set(20,20,20)
+        const name = new SpriteText(metadata.name, 20, "red");
+        const description = new SpriteText(metadata.description, 10, "blue")
+        const external_url = new SpriteText(metadata.external_url, 8, "green")
+        sprite.scale.set(20, 20, 20)
         name.position.y = 60;
         description.position.y = 30;
         external_url.position.y = 20
@@ -236,25 +270,25 @@ export default function Game() {
         gameInfo.add(name)
         gameInfo.add(description)
         gameInfo.add(external_url)
-        if(metadata.scenario){
-          const loader = new GLTFLoader().setPath(`https://nftstorage.link/ipfs/${metadata.scenario}/gltf/` );
-          loader.load( 'scene.gltf', function ( gltf ) {
+        if (metadata.scenario) {
+          const loader = new GLTFLoader().setPath(`https://nftstorage.link/ipfs/${metadata.scenario}/gltf/`);
+          loader.load('scene.gltf', function (gltf) {
             console.log(gltf)
-            gltf.scene.position.set(0,1,0)
-            gltf.scene.scale.set(gltf.scene.scale.x*1.2,gltf.scene.scale.y*1.2,gltf.scene.scale.z*1.2)
-            scene.add( gltf.scene );
+            gltf.scene.position.set(0, 1, 0)
+            gltf.scene.scale.set(gltf.scene.scale.x * 1.2, gltf.scene.scale.y * 1.2, gltf.scene.scale.z * 1.2)
+            scene.add(gltf.scene);
 
 
           });
         }
 
-        gameInfo.position.set(0,10,0)
+        gameInfo.position.set(0, 10, 0)
         scene.add(gameInfo);
 
         const filter = contract.filters.Result();
-        contract.on(filter,handleEvents)
+        contract.on(filter, handleEvents)
 
-      } catch(err){
+      } catch (err) {
         console.log(err)
       }
     }
@@ -264,55 +298,55 @@ export default function Game() {
     }
   }
 
-  const handleEvents = (uri,requestId,result) => {
+  const handleEvents = (uri, requestId, result) => {
 
-      console.log(`Event: URI - ${uri} Result - ${result}`);
-      if(result){
-        if(uri === ref.current?.uri){
+    console.log(`Event: URI - ${uri} Result - ${result}`);
+    if (result) {
+      if (uri === ref.current?.uri) {
 
-        } else {
-
-        }
       } else {
-        let i = 0;
-        if(uri === ref.current?.uri){
-
-        } else {
-
-        }
-        /*
-        const metorsInterval = setInterval(() => {
-          if(i < 100){
-
-          } else {
-            clearInterval(metorsInterval);
-          }
-          i = i + 1;
-        },500);
-        */
 
       }
+    } else {
+      let i = 0;
+      if (uri === ref.current?.uri) {
+
+      } else {
+
+      }
+      /*
+      const metorsInterval = setInterval(() => {
+        if(i < 100){
+
+        } else {
+          clearInterval(metorsInterval);
+        }
+        i = i + 1;
+      },500);
+      */
+
+    }
   }
 
   const generateFloor = () => {
     // floor
 
-    let floorGeometry = new THREE.PlaneGeometry( 2000, 2000, 100, 100 );
-    floorGeometry.rotateX( - Math.PI / 2 );
+    let floorGeometry = new THREE.PlaneGeometry(2000, 2000, 100, 100);
+    floorGeometry.rotateX(- Math.PI / 2);
 
     // vertex displacement
 
     let position = floorGeometry.attributes.position;
 
-    for ( let i = 0, l = position.count; i < l; i ++ ) {
+    for (let i = 0, l = position.count; i < l; i++) {
 
-      vertex.fromBufferAttribute( position, i );
+      vertex.fromBufferAttribute(position, i);
 
       vertex.x += Math.random() * 20 - 10;
       vertex.y += Math.random() * 2;
       vertex.z += Math.random() * 20 - 10;
 
-      position.setXYZ( i, vertex.x, vertex.y, vertex.z );
+      position.setXYZ(i, vertex.x, vertex.y, vertex.z);
 
     }
 
@@ -321,74 +355,74 @@ export default function Game() {
     position = floorGeometry.attributes.position;
     const colorsFloor = [];
 
-    for ( let i = 0, l = position.count; i < l; i ++ ) {
+    for (let i = 0, l = position.count; i < l; i++) {
 
-      color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-      colorsFloor.push( color.r, color.g, color.b );
+      color.setHSL(Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75);
+      colorsFloor.push(color.r, color.g, color.b);
 
     }
 
-    floorGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colorsFloor, 3 ) );
+    floorGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colorsFloor, 3));
 
-    const floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: true } );
+    const floorMaterial = new THREE.MeshBasicMaterial({ vertexColors: true });
 
-    const floor = new THREE.Mesh( floorGeometry, floorMaterial );
-    scene.add( floor );
+    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+    scene.add(floor);
   }
 
   async function init() {
 
-    camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
     camera.position.y = 2;
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color( 0xffffff );
-    scene.fog = new THREE.Fog( 0xffffff, 0, 750 );
+    scene.background = new THREE.Color(0xffffff);
+    scene.fog = new THREE.Fog(0xffffff, 0, 750);
 
-    const light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.75 );
-    light.position.set( 0.5, 1, 0.75 );
-    scene.add( light );
-    controls = new PointerLockControls( camera, document.body );
+    const light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 0.75);
+    light.position.set(0.5, 1, 0.75);
+    scene.add(light);
+    controls = new PointerLockControls(camera, document.body);
 
-    const blocker = document.getElementById( 'blocker' );
-    const instructions = document.getElementById( 'instructions' );
+    const blocker = document.getElementById('blocker');
+    const instructions = document.getElementById('instructions');
 
-    instructions.addEventListener( 'click', function () {
+    instructions.addEventListener('click', function () {
       controls.lock();
     });
 
-    controls.addEventListener( 'lock', function () {
+    controls.addEventListener('lock', function () {
 
       instructions.style.display = 'none';
       blocker.style.display = 'none';
 
-    } );
+    });
 
-    controls.addEventListener( 'unlock', function () {
+    controls.addEventListener('unlock', function () {
 
       blocker.style.display = 'block';
       instructions.style.display = '';
 
-    } );
+    });
 
-    scene.add( controls.getObject() );
+    scene.add(controls.getObject());
 
-    document.addEventListener( 'keydown', onKeyDown );
-    document.addEventListener( 'keyup', onKeyUp );
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keyup', onKeyUp);
 
-    raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
+    raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, - 1, 0), 0, 10);
 
     generateFloor();
 
-    renderer = new THREE.WebGLRenderer( { antialias: true } );
-    renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
 
-    document.getElementById("canvas-container").appendChild( renderer.domElement );
+    document.getElementById("canvas-container").appendChild(renderer.domElement);
 
 
 
-    window.addEventListener( 'resize', onWindowResize );
+    window.addEventListener('resize', onWindowResize);
 
   }
 
@@ -397,54 +431,54 @@ export default function Game() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
 
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setSize(window.innerWidth, window.innerHeight);
 
   }
 
   async function animate() {
 
     const contractInitiated = ref.current?.contractInitiated;
-    if(!contractInitiated){
+    if (!contractInitiated) {
       await checkUris();
     }
-    requestAnimationFrame( animate );
+    requestAnimationFrame(animate);
     const time = performance.now();
-    if ( controls.isLocked === true ) {
+    if (controls.isLocked === true) {
 
-      raycaster.ray.origin.copy( controls.getObject().position );
+      raycaster.ray.origin.copy(controls.getObject().position);
       raycaster.ray.origin.y -= 10;
 
-      const intersections = raycaster.intersectObjects( objects, false );
+      const intersections = raycaster.intersectObjects(objects, false);
 
       const onObject = intersections.length > 0;
 
-      const delta = ( time - prevTime ) / 1000;
+      const delta = (time - prevTime) / 1000;
 
       velocity.x -= velocity.x * 10.0 * delta;
       velocity.z -= velocity.z * 10.0 * delta;
 
       velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
 
-      direction.z = Number( moveForward ) - Number( moveBackward );
-      direction.x = Number( moveRight ) - Number( moveLeft );
+      direction.z = Number(moveForward) - Number(moveBackward);
+      direction.x = Number(moveRight) - Number(moveLeft);
       direction.normalize(); // this ensures consistent movements in all directions
 
-      if ( moveForward || moveBackward ) velocity.z -= direction.z * 400.0 * delta;
-      if ( moveLeft || moveRight ) velocity.x -= direction.x * 400.0 * delta;
+      if (moveForward || moveBackward) velocity.z -= direction.z * 400.0 * delta;
+      if (moveLeft || moveRight) velocity.x -= direction.x * 400.0 * delta;
 
-      if ( onObject === true ) {
+      if (onObject === true) {
 
-        velocity.y = Math.max( 0, velocity.y );
+        velocity.y = Math.max(0, velocity.y);
         canJump = true;
 
       }
 
-      controls.moveRight( - velocity.x * delta );
-      controls.moveForward( - velocity.z * delta );
+      controls.moveRight(- velocity.x * delta);
+      controls.moveForward(- velocity.z * delta);
 
-      controls.getObject().position.y += ( velocity.y * delta ); // new behavior
+      controls.getObject().position.y += (velocity.y * delta); // new behavior
 
-      if ( controls.getObject().position.y < 10 ) {
+      if (controls.getObject().position.y < 10) {
 
         velocity.y = 0;
         controls.getObject().position.y = 10;
@@ -457,7 +491,7 @@ export default function Game() {
 
     prevTime = time;
 
-    renderer?.render( scene, camera );
+    renderer?.render(scene, camera);
 
   }
 
