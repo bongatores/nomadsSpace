@@ -48,7 +48,8 @@ export default function App() {
     client,
     initiateClient,
     getNftsFrom,
-    getENSFrom
+    getENSFrom,
+    getGameUris
   } = useClient();
 
 
@@ -137,6 +138,7 @@ export default function App() {
     actions.setUri(uri);
     actions.setSelf(self);
     actions.setGameContract(gameContract);
+
   }, [
     coinbase,
     provider,
@@ -147,6 +149,7 @@ export default function App() {
     uri,
     gameContract
   ]);
+
   useEffect(() => {
     initiateClient(netId);
   }, [netId]);
@@ -208,7 +211,7 @@ export default function App() {
         let providerENS;
         if (provider.network.chainId != 4 && provider.network.chainId != 5) {
           // Use rinkeby default network for networks that do not have ENS support PROOF OF CONCEPT
-          providerENS = new ethers.providers.JsonRpcProvider("https://rpc.ankr.com/eth_rinkeby")
+          providerENS = new ethers.providers.JsonRpcProvider("https://rpc.ankr.com/eth_goerli")
         }
         else {
           providerENS = provider;
@@ -288,7 +291,7 @@ export default function App() {
 
   return (
     <AppContext.Provider value={{ state, actions }}>
-      <Game />
+      <Game client={client} getGameUris={getGameUris} />
       <Box id="blocker">
         <MainHeader
           loadWeb3Modal={loadWeb3Modal}
@@ -309,7 +312,7 @@ export default function App() {
               <MyUNS
                 setMetadata={setUri}
               /> :
-              coinbase &&
+              coinbase && !self &&
               <Tabs>
                 {
                   /*
@@ -351,25 +354,6 @@ export default function App() {
                     />
                   </Tab>
                 }
-
-                {
-                  self &&
-                  <Tab title="Use Profile">
-                    <UseSelfIdSection
-                      setName={setName}
-                      setDescription={setDescription}
-                      setImg={setImg}
-                      setUrl={setUrl}
-                      setScenario={setScenario}
-                      name={name}
-                      description={description}
-                      url={url}
-                      scenario={scenario}
-                      setUri={setUri}
-                      setProfile={setProfile}
-                    />
-                  </Tab>
-                }
               </Tabs>
           }
           {
@@ -380,6 +364,10 @@ export default function App() {
               setImg={setImg}
               setUrl={setUrl}
               setScenario={setScenario}
+              name={name}
+              description={description}
+              url={url}
+              scenario={scenario}
               setUri={setUri}
               setProfile={setProfile}
             />
