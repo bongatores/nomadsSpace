@@ -55,6 +55,8 @@ export default function Game(props) {
   const color = new THREE.Color();
   const infos = [];
 
+  let gameText;
+
   const onKeyDown = async function (event) {
 
     switch (event.code) {
@@ -97,9 +99,20 @@ export default function Game(props) {
             sendingTx: true
           }
           try {
+            let text = new SpriteText("No URI selected", 5, "red");
             let string = ref.current.uri;
+            if(string){
+              text = new SpriteText("Inserting data, accept transaction ...", 5, "blue");
+            }
+            setGameMessage(text);
             console.log(string)
-            if (!string) return;
+            if (!string) {
+              ref.current = {
+                ...ref.current,
+                sendingTx: false
+              }
+              return
+            };
             const signer = gameProvider.getSigner();
             const gameContractWithSigner = contract.connect(signer);
             const tx = await gameContractWithSigner.requestRandomWords(string,[x,z]);
@@ -123,6 +136,24 @@ export default function Game(props) {
     }
 
   };
+
+  const setGameMessage = (text) => {
+    const dist = 50;
+    const cwd = new THREE.Vector3();
+    camera.getWorldDirection(cwd);
+
+    cwd.multiplyScalar(dist);
+    cwd.add(camera.position);
+
+    text.position.set(cwd.x, cwd.y+3, cwd.z);
+    text.setRotationFromQuaternion(camera.quaternion);
+    scene.add(text);
+    gameText = text
+    setTimeout(() => {
+      scene.remove(text);
+      gameText = null;
+    },5000);
+  }
 
   const onKeyUp = function (event) {
 
@@ -331,19 +362,7 @@ export default function Game(props) {
         text = new SpriteText("Someone tried to get a space!", 8, "blue");
       }
     }
-    const dist = 50;
-    const cwd = new THREE.Vector3();
-    camera.getWorldDirection(cwd);
-
-    cwd.multiplyScalar(dist);
-    cwd.add(camera.position);
-
-    text.position.set(cwd.x, cwd.y, cwd.z);
-    text.setRotationFromQuaternion(camera.quaternion);
-    scene.add(text);
-    setTimeout(() => {
-      scene.remove(text);
-    },5000);
+    setGameMessage(text);
   }
 
   const generateFloor = () => {
@@ -460,6 +479,17 @@ export default function Game(props) {
     const client = ref.current?.client;
     if (!contractInitiated && client) {
       await checkUris();
+    }
+
+    if(gameText){
+      const dist = 50;
+      const cwd = new THREE.Vector3();
+      camera.getWorldDirection(cwd);
+
+      cwd.multiplyScalar(dist);
+      cwd.add(camera.position);
+
+      gameText.position.set(cwd.x, cwd.y+2, cwd.z);
     }
     requestAnimationFrame(animate);
     const time = performance.now();
