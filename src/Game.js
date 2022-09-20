@@ -15,6 +15,11 @@ import Resolution from '@unstoppabledomains/resolution';
 import { Core } from '@self.id/core'
 
 import { useAppContext } from './hooks/useAppState'
+import {
+  createStreamRClient,
+  subscribeStreamR,
+  publishMessageStreamr
+} from './hooks/Streamr.js';
 
 const core = new Core({ ceramic: 'testnet-clay' })
 
@@ -24,7 +29,7 @@ const resolution = Resolution.fromEthersProvider(new ethers.providers.JsonRpcPro
 export default function Game(props) {
 
 
-  const { state } = useAppContext();
+  const { state,actions } = useAppContext();
   const ref = useRef({});
 
   useEffect(() => {
@@ -32,7 +37,7 @@ export default function Game(props) {
     animate();
   }, []);
   useEffect(() => {
-    ref.current = state
+    ref.current = state;
   }, [state]);
   useEffect(() => {
     ref.current.client = props.client;
@@ -54,8 +59,67 @@ export default function Game(props) {
   const vertex = new THREE.Vector3();
   const color = new THREE.Color();
   const infos = [];
-
+  const streamrTexts = [];
+  const streamId = process.env.REACT_APP_STREAMR_ID;
   let gameText;
+
+
+  const occupySpace = async () => {
+    camera.updateMatrixWorld();
+    const vector = camera.position.clone();
+    console.log(vector)
+    const x = (vector.x/10).toFixed(0);
+    const z = (vector.z/10).toFixed(0);
+    console.log(`Inserting data at ${x},${z}`)
+    const coinbaseGame = ref.current.coinbase;
+    const contract = ref.current.gameContract;
+    const gameProvider = ref.current.provider;
+    const sendingTxGame = ref.current.sendingTx;
+    console.log(ref.current)
+    if (!sendingTxGame && coinbaseGame && contract) {
+      ref.current = {
+        ...ref.current,
+        sendingTx: true
+      }
+      try {
+        let text = new SpriteText("No URI selected", 5, "red");
+        let string = ref.current.uri;
+        if(string){
+          text = new SpriteText("Inserting data, accept transaction ...", 5, "blue");
+        }
+        setGameMessage(text);
+        console.log(string)
+        if (!string) {
+          ref.current = {
+            ...ref.current,
+            sendingTx: false
+          }
+          return
+        };
+        const signer = gameProvider.getSigner();
+        const gameContractWithSigner = contract.connect(signer);
+        const tx = await gameContractWithSigner.requestRandomWords(string,[x,z]);
+        text = new SpriteText("Transaction sent, wait for confirmation ...", 5, "blue");
+        setGameMessage(text);
+        await tx.wait();
+        text = new SpriteText("Transaction confirmed", 5, "blue");
+        setGameMessage(text);
+
+      } catch (err) {
+        console.log(err)
+      }
+      ref.current = {
+        ...ref.current,
+        sendingTx: false
+      }
+    }
+  }
+
+  const handleStreamrMessages = async (msg) => {
+    console.log(msg)
+    const text = new SpriteText(`${msg.message} \n I am \n ${msg.from}`, 4, "blue");
+    setGameMessage(text);
+  }
 
   const onKeyDown = async function (event) {
 
@@ -82,50 +146,41 @@ export default function Game(props) {
         break;
 
       case 'KeyP':
-        camera.updateMatrixWorld();
-        const vector = camera.position.clone();
-        console.log(vector)
-        const x = (vector.x/10).toFixed(0);
-        const z = (vector.z/10).toFixed(0);
-        console.log(`Inserting data at ${x},${z}`)
-        const coinbaseGame = ref.current.coinbase;
-        const contract = ref.current.gameContract;
-        const gameProvider = ref.current.provider;
-        const sendingTxGame = ref.current.sendingTx;
-        console.log(ref.current)
-        if (!sendingTxGame && coinbaseGame && contract) {
-          ref.current = {
-            ...ref.current,
-            sendingTx: true
-          }
-          try {
-            let text = new SpriteText("No URI selected", 5, "red");
-            let string = ref.current.uri;
-            if(string){
-              text = new SpriteText("Inserting data, accept transaction ...", 5, "blue");
-            }
-            setGameMessage(text);
-            console.log(string)
-            if (!string) {
-              ref.current = {
-                ...ref.current,
-                sendingTx: false
-              }
-              return
-            };
-            const signer = gameProvider.getSigner();
-            const gameContractWithSigner = contract.connect(signer);
-            const tx = await gameContractWithSigner.requestRandomWords(string,[x,z]);
-            await tx.wait();
-          } catch (err) {
-            console.log(err)
-          }
-          ref.current = {
-            ...ref.current,
-            sendingTx: false
-          }
-        }
+        if(!ref.current?.netId !== 80001) return;
+        if(ref.current?.lock) return;
+        occupySpace();
+        break;
 
+      case 'KeyM':
+        try{
+          console.log(ref.current);
+          let text;
+          if(ref.current?.lock) return;
+          if(!ref.current?.coinbase) return;
+          if(!ref.current?.streamr){
+            text = new SpriteText(`Initiating StreamR ...`, 4, "blue");
+            setGameMessage(text)
+            await createStreamRClient();
+            await subscribeStreamR(streamId,handleStreamrMessages)
+            ref.current = {
+              ...ref.current,
+              streamr: true
+            }
+            text = new SpriteText(`StreamR initiated. \n Press M to send Hello message to all`, 4, "blue");
+            setGameMessage(text)
+
+          } else {
+            text = new SpriteText(`Sign to publish hello message ...`, 4, "blue");
+            setGameMessage(text)
+            await publishMessageStreamr(streamId,{
+              from: ref.current.uri ? ref.current.uri : ref.current.coinbase,
+              message: "Hello!"
+            });
+          }
+
+        } catch(err){
+          console.log(err)
+        }
         break;
 
       case 'Space':
@@ -152,7 +207,7 @@ export default function Game(props) {
     setTimeout(() => {
       scene.remove(text);
       gameText = null;
-    },5000);
+    },8000);
   }
 
   const onKeyUp = function (event) {
@@ -433,6 +488,10 @@ export default function Game(props) {
 
       instructions.style.display = 'none';
       blocker.style.display = 'none';
+      ref.current = {
+        ...ref.current,
+        lock: true
+      }
 
     });
 
@@ -440,7 +499,10 @@ export default function Game(props) {
 
       blocker.style.display = 'block';
       instructions.style.display = '';
-
+      ref.current = {
+        ...ref.current,
+        lock: false
+      }
     });
 
     scene.add(controls.getObject());

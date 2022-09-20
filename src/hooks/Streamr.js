@@ -15,7 +15,6 @@ export function createStreamRClient() {
         }
     })
     _streamr = streamr;
-
     console.log("client created");
 
 }
