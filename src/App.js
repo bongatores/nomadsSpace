@@ -3,7 +3,9 @@ import { useState, useEffect } from 'react';
 import {
   Box,
   Tab,
-  Tabs
+  Tabs,
+  Spinner,
+  Text,
 } from 'grommet';
 import { ethers } from "ethers";
 
@@ -313,6 +315,21 @@ export default function App() {
                 setMetadata={setUri}
               /> :
               coinbase && !self &&
+              <>
+              {
+                loadingMyENS && client &&
+                <>
+                    <Spinner />
+                    <Text>Loading your ENS domains ...</Text>
+                </>
+              }
+              {
+                loadingMyNFTs && client &&
+                <>
+                    <Spinner />
+                    <Text>Loading your NFTs ...</Text>
+                </>
+              }
               <Tabs>
                 {
                   /*
@@ -355,6 +372,7 @@ export default function App() {
                   </Tab>
                 }
               </Tabs>
+              </>
           }
           {
             self &&

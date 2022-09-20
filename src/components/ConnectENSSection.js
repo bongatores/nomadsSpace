@@ -11,25 +11,18 @@ export default function ConnectENSSection(props) {
     return (
         <>
             {
-
-                props.loadingMyENS && props.client ?
+                (!props.graphErr && props.client) ?
                     <>
-                        <Spinner />
-                        <Paragraph>Loading your ENS domains ...</Paragraph>
+                        <MyENS myOwnedENS={props.myOwnedENS}
+                            setMetadata={props.setMetadata}
+                        />
                     </> :
-                    (!props.graphErr && props.client) ?
-                        <>
-                            <MyENS myOwnedENS={props.myOwnedENS}
-                                setMetadata={props.setMetadata}
-                            />
-                        </> :
-                        !props.client &&
-                        <>
-                            <Paragraph>Sorry! Could not load your ENS (subgraph can be syncing), try changing network or enter as guest.</Paragraph>
-                        </>
+                    !props.client &&
+                    <>
+                        <Paragraph>Sorry! Could not load your ENS (subgraph can be syncing), try changing network or enter as guest.</Paragraph>
+                    </>
 
             }
-
 
         </>
     )
