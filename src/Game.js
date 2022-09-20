@@ -146,7 +146,8 @@ export default function Game(props) {
         break;
 
       case 'KeyP':
-        if(!ref.current?.netId !== 80001) return;
+        console.log(ref.current)
+        if(ref.current?.netId !== 80001) return;
         if(ref.current?.lock) return;
         occupySpace();
         break;
@@ -171,7 +172,6 @@ export default function Game(props) {
 
           } else {
             text = new SpriteText(`Sign to publish hello message ...`, 4, "blue");
-            setGameMessage(text)
             await publishMessageStreamr(streamId,{
               from: ref.current.uri ? ref.current.uri : ref.current.coinbase,
               message: "Hello!"
@@ -490,7 +490,7 @@ export default function Game(props) {
       blocker.style.display = 'none';
       ref.current = {
         ...ref.current,
-        lock: true
+        lock: false
       }
 
     });
@@ -501,7 +501,7 @@ export default function Game(props) {
       instructions.style.display = '';
       ref.current = {
         ...ref.current,
-        lock: false
+        lock: true
       }
     });
 
