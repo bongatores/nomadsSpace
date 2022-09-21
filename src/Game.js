@@ -60,7 +60,6 @@ export default function Game(props) {
   const color = new THREE.Color();
   const infos = [];
   const streamrTexts = [];
-  const streamId = process.env.REACT_APP_STREAMR_ID;
   let gameText;
 
 
@@ -154,6 +153,8 @@ export default function Game(props) {
 
       case 'KeyM':
         try{
+          const streamId = process.env.REACT_APP_STREAMR_ID;
+          console.log(streamId)
           console.log(ref.current);
           let text;
           if(ref.current?.lock) return;
@@ -172,7 +173,8 @@ export default function Game(props) {
 
           } else {
             text = new SpriteText(`Sign to publish hello message ...`, 4, "blue");
-            await publishMessageStreamr(streamId,{
+            setGameMessage(text)
+            publishMessageStreamr(streamId,{
               from: ref.current.uri ? ref.current.uri : ref.current.coinbase,
               message: "Hello!"
             });
@@ -312,7 +314,7 @@ export default function Game(props) {
                 </defs>
             </svg>
           `
-          avatar = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(svg))) 
+          avatar = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(svg)))
         }
 
         try{
