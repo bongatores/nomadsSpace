@@ -47,13 +47,10 @@ export default function UseWalletSection(props){
   return(
     <Accordion>
     <Box>
-      <Text><center>Name</center></Text>
-      <TextInput onChange={event => setName(event.target.value)}/>
-      <Text><center>Description</center></Text>
-      <TextInput onChange={event => setDescription(event.target.value)}/>
-      <Text><center>Image</center></Text>
+      <TextInput onChange={event => setName(event.target.value)} placeholder='Name' className='input_box'/>
+      <TextInput onChange={event => setDescription(event.target.value)} placeholder='Description' className='input_box'/>
       <FileInput
-        name="Image"
+        name="Select image"
         accept="image/*"
         onChange={event => {
           const fileList = event.target.files;

@@ -64,8 +64,8 @@ export default function GameHeader(props){
 
     {
       state.uri &&
-      <Paragraph style={{wordBreak: 'break-word'}}>
-        URI: {state.uri}
+      <Paragraph className='selected'>
+        Chosen URI: <span>{state.uri}</span>
       </Paragraph>
     }
     </>

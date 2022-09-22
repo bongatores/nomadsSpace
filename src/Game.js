@@ -153,7 +153,7 @@ export default function Game(props) {
 
       case 'KeyM':
         try{
-          const streamId = process.env.REACT_APP_STREAMR_ID;
+          const streamId = "0xdd3b7754aee323a8b51cb8e063e8fc4a31e5c2cc/empty-space";
           console.log(streamId)
           console.log(ref.current);
           let text;

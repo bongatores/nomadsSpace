@@ -17,7 +17,7 @@ export default function MyENS(props) {
             {
                 props.myOwnedENS?.length > 0 &&
                 <>
-                    <Paragraph size="small">Select ENS to play</Paragraph>
+                    <Paragraph size="small" className='titles'>Select ENS to play</Paragraph>
                     <Box alignContent="center" align="center" pad="medium" direction="row-responsive" wrap={true}>
                         {
                             props.myOwnedENS?.map(obj => {
@@ -33,10 +33,10 @@ export default function MyENS(props) {
 
                                 return (
 
-                                    <Card key={`${obj.domainName}`} height="medium" width="small" background="light-1" align="center">
+                                    <Card key={`${obj.domainName}`} height="medium" width="small" background="light-1" align="center" className='ens_cards'>
                                         {
                                           !avatar &&
-                                          <CardHeader pad="medium"><b>{`${obj.domainName}`}</b></CardHeader>
+                                          <CardHeader pad="medium" className='header'><b>{`${obj.domainName}`}</b></CardHeader>
                                         }
                                         <CardBody pad="small">
 
@@ -70,7 +70,7 @@ export default function MyENS(props) {
                                           }
 
                                         </CardBody>
-                                        <CardFooter pad={{ horizontal: "small" }} background="light-2" align="center" alignContent="center">
+                                        <CardFooter pad={{ horizontal: "small" }} align="center" alignContent="center">
                                             <Button secondary onClick={() => {
                                                 console.log(obj.contentHash);
                                                 props.setMetadata(obj.domainName)
