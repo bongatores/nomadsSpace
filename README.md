@@ -4,7 +4,7 @@
 
   This dapp allows users explore and modfy an empty world by inserting data in it.
 
-  A smart contract has been done to map coordenates in the world (x,z) into a uri, which can be a ipfs hash from custom data with same nft metadata standatard, an ENS domain name, an UNS domain name, a ipfs hash of a nft metadata or a decentralized identity from ceramic self.id. In the event of data being inserted in a occupied position, chainlink vrf is used to generated a random number that defines if the actual data must be replaced or not.  
+  A smart contract has been done to map coordenates in the world (x,z) into a uri, which can be a ipfs hash from custom data with same nft metadata standatard, an ENS (goerli testnetwork) domain name, an UNS domain name, a ipfs hash of a nft metadata or a decentralized identity from ceramic self.id. In the event of data being inserted in a occupied position, chainlink vrf is used to generated a random number that defines if the actual data must be replaced or not.  
 
 ## Technologies
 
@@ -91,6 +91,8 @@
 <details>
 
 <summary style="font-size:24px"><b>Using ENS</b></summary>
+
+- Do a domain at https://app.ens.domains/ on goerli testnetwork
 
 - Click "Use ENS" tab;
 
