@@ -7172,7 +7172,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ceramic-cacao@npm:^1.1.1, ceramic-cacao@npm:^1.3.1":
+"ceramic-cacao@npm:^1.1.1, ceramic-cacao@npm:^1.3.1, ceramic-cacao@npm:^1.4.0":
   version: 1.4.0
   resolution: "ceramic-cacao@npm:1.4.0"
   dependencies:
@@ -8743,6 +8743,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dids@npm:^3.3.1":
+  version: 3.3.1
+  resolution: "dids@npm:3.3.1"
+  dependencies:
+    "@stablelib/random": ^1.0.1
+    ceramic-cacao: ^1.4.0
+    dag-jose-utils: ^2.0.0
+    did-jwt: ^6.0.0
+    did-resolver: ^3.1.5
+    multiformats: ^9.4.10
+    rpc-utils: ^0.6.1
+    uint8arrays: ^3.0.0
+  checksum: 9955e9bd392a816404d4810cf68193aeffbcbd6ee12976d63d925dc991b4cae8a5972548dfeee9e1d254de3959c4aff08d4aa5ba718c037af7d80172f97ee40f
+  languageName: node
+  linkType: hard
+
 "didyoumean@npm:^1.2.2":
   version: 1.2.2
   resolution: "didyoumean@npm:1.2.2"
@@ -9189,6 +9205,7 @@ __metadata:
     chroma-js: ^2.4.2
     crypto-browserify: ^3.12.0
     customize-cra: ^1.0.0
+    dids: ^3.3.1
     ethereum-blockies-base64: ^1.0.2
     ethers: ^5.5.4
     fs: ^0.0.1-security
