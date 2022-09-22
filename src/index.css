@@ -37,7 +37,7 @@ code {
   background-image: radial-gradient( circle farthest-corner at 10% 20%, rgba(0,221,214,1) 0%, rgba(51,102,255,1) 90% );
   background-color: #ffffffed;
   padding: 3%;
-  opacity: 0.9;
+  opacity: 0.98;
   border-radius: 25px;
 }
 
@@ -83,4 +83,57 @@ h3{
   font-family: 'franchise';
   color: #ffffffa8;
   font-size: 32px;
+}
+
+.titles{
+  text-align: center;
+  width: 100%;
+  max-width: 100% !important;
+  font-size: 18px !important;
+  color: white;
+  line-height: 10px !important;
+}
+
+.ens_cards{
+  margin: 0 5px;
+  height: 300px !important;
+  padding: 10px;
+}
+
+.ens_cards .header b{
+  overflow: auto;
+  white-space: pre-wrap;
+  width: 100%;
+}
+
+.ens_cards .header{
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.input_box{
+  border-bottom: 1px solid rgba(0,0,0,0.33) !important;
+  border: unset !important;
+  background: #fafafa7d !important;
+  margin: 5px 0 !important;
+}
+
+.tes ::placeholder{
+  color: red !important;
+  opacity: 1 !important;
+}
+
+.selected{
+  word-break: break-word;
+  background: white;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.selected span{
+  background: #23222330;
+  padding: 4px;
+  border-radius: 5px;
+  display: block;
 }
