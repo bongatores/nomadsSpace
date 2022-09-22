@@ -226,11 +226,15 @@ export default function App() {
         for (let i = 0; i < listOfOwnedDomains.length; i++) {
 
           let domainName = listOfOwnedDomains[i].name;
-          let resolver = await providerENS.getResolver(domainName);
-          let contentHash = await resolver.getContentHash();
 
-          let scenario = await resolver.getText("scenario");
-          let avatar = await resolver.getText("avatar");
+          let resolver = await providerENS.getResolver(domainName);
+          let contentHash, scenario, avatar;
+          if(resolver){
+            contentHash = await resolver.getContentHash();
+            scenario = await resolver.getText("scenario");
+            avatar = await resolver.getText("avatar");
+          }
+
 
           let newENS = {
             domainName: domainName,
