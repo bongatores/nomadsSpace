@@ -1,19 +1,19 @@
 # EmptySpace
 
-  A 3d space where all places can be yours until someone removes it from you.
+  A 3d space where all places can be yours until someone removes them from you.
 
-  This dapp allows users explore and modfy an empty world by inserting data in it.
+  This dapp allows users to explore and modify an empty world by inserting data in it.
 
-  A smart contract has been done to map coordenates in the world (x,z) into a uri, which can be a ipfs hash from custom data with same nft metadata standatard, an ENS (goerli testnetwork) domain name, an UNS domain name, a ipfs hash of a nft metadata or a decentralized identity from ceramic self.id. In the event of data being inserted in a occupied position, chainlink vrf is used to generated a random number that defines if the actual data must be replaced or not.  
+  A Smart Contract was deployed to map coordinates in the world (x,z) into a URI, which can be a IPFS Hash from custom data with same NFT metadata standatard, an ENS (goerli testnetwork) domain name, an UNS domain name or a decentralized identity from Ceramic `self.id`. In the event of trying to insert data at an occupied position  Chainlink VRF is used to simulate a coin flip (50% chance of replacing).
 
 ## Technologies
 
   - **React** - constructs the dapp;
   - **Groomet** - react framework to help doing the user interface;
   - **ThreeJS** - renders the 3d world and allows the user to explore it and interact with it;
-  - **IPFS** - get data from ipfs, upload data to ipfs using nft.storage (custom data with nft metadata pattern or ceramic self.id image)
-  - **TheGraph** - get NFTs and ENS from connected wallet, get positions occupied by users data in the game (custom graph deployed at https://thegraph.com/hosted-service/subgraph/henrique1837/empty-space);
-  - **ENS** - get data from ENS domains (avatar, description, name) to display;
+  - **IPFS** -  gets data from ipfs, upload data to ipfs using nft.storage (custom data with NFT metadata pattern or ceramic self.id image)
+  - **TheGraph** - gets NFTs and ENS from connected wallet, get positions occupied by users data in the game (custom graph deployed at https://thegraph.com/hosted-service/subgraph/henrique1837/empty-space);
+  - **ENS** - gets data from ENS domains (avatar, description, name) to display;
   - **UNS** - allows user login with his UNS domain in order to insert it as the data source in the world;
   - **StreamR** - allows connected users to send hello message to all possible connected users;
   - **Ceramic** - used as data for decentralized identities inserted in the contract;
@@ -30,20 +30,20 @@
 ## Testing Guide
 
 #### Controls
-  - WASD keys: move
-  - M:  initate streamr and send hello message
-  - P: insert data in the current coordenate
+  - `WASD` keys: Move
+  - `M` key: Initiate Streamr and send hello message
+  - `P` key: Insert data in the current coordinate
 
 <details>
 <summary style="font-size:24px"><b>Guest (No Wallet)</b></summary>
 
-  This option can be used by users that does not have Wallet connected, NFTs or custom URI setted.
+  This option can be selected by users that don't have Wallet connected, NFTs or custom URI setted.
 
  - Click "Play" button;
 
  ![Guest](https://nftstorage.link/ipfs/bafybeifdfj6j47qflrid3w2h52gjzh7w2fdxyb72o3v74zdb2ppcgo7sha/guest_1.png "Guest")
 
- - Move using wasd keys, explore the empty space! (it can be really empty or not, that depends on users);
+ - Move using `WASD` keys, explore the empty space! (it can be really empty or not, that depends on users!);
 
  ![Guest](https://nftstorage.link/ipfs/bafybeifdfj6j47qflrid3w2h52gjzh7w2fdxyb72o3v74zdb2ppcgo7sha/guest_2.png "Guest")
 
@@ -113,7 +113,7 @@
 
 <summary style="font-size:24px"><b>Using ENS</b></summary>
 
-- Do a domain at https://app.ens.domains/ on goerli testnetwork
+- Do a domain at https://app.ens.domains/ on goerli test network
 
  ![ENS](https://nftstorage.link/ipfs/bafybeifdfj6j47qflrid3w2h52gjzh7w2fdxyb72o3v74zdb2ppcgo7sha/ens_1.png "ENS")
 
@@ -125,7 +125,7 @@
 
 - Click "Play"
 
-- Use "P" to insert the ens data in the world
+- Use "P" to insert the ens data in the world.
 
  ![ENS](https://nftstorage.link/ipfs/bafybeifdfj6j47qflrid3w2h52gjzh7w2fdxyb72o3v74zdb2ppcgo7sha/ens_3.jpeg "ENS")
 
@@ -156,10 +156,10 @@
 
 ## .env variables
 
- - REACT_APP_NFT_STORAGE_API
- - REACT_APP_UNS_REDIRECT
- - REACT_APP_UNS_ID
- - REACT_APP_STREAMR_ID
+ - `REACT_APP_NFT_STORAGE_API`
+ - `REACT_APP_UNS_REDIRECT`
+ - `REACT_APP_UNS_ID`
+ - `REACT_APP_STREAMR_ID`
 
 # Getting Started with Create React App
 
