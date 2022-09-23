@@ -41,21 +41,32 @@
 
  - Click "Play" button;
 
- - Move using arrows keys, explore the empty space! (it can be really empty or not, that depends on users);
+ ![Guest](https://nftstorage.link/ipfs/bafybeifdfj6j47qflrid3w2h52gjzh7w2fdxyb72o3v74zdb2ppcgo7sha/guest_1.png "Guest")
 
+ - Move using wasd keys, explore the empty space! (it can be really empty or not, that depends on users);
+
+ ![Guest](https://nftstorage.link/ipfs/bafybeifdfj6j47qflrid3w2h52gjzh7w2fdxyb72o3v74zdb2ppcgo7sha/guest_2.png "Guest")
 
 </details>
 
 <details>
 <summary style="font-size:24px"><b>Custom Data</b></summary>
 
+- Connect your wallet
+
+![Custom](https://nftstorage.link/ipfs/bafybeifdfj6j47qflrid3w2h52gjzh7w2fdxyb72o3v74zdb2ppcgo7sha/wallet_1.png "Custom")
+
 - Click "Use Wallet" tab;
 
 - Insert data in IPFS
 
+ ![Custom](https://nftstorage.link/ipfs/bafybeifdfj6j47qflrid3w2h52gjzh7w2fdxyb72o3v74zdb2ppcgo7sha/wallet_2.png "Custom")
+
 - Click "Play"
 
 - Use "P" to insert the data in the world
+
+ ![Custom](https://nftstorage.link/ipfs/bafybeifdfj6j47qflrid3w2h52gjzh7w2fdxyb72o3v74zdb2ppcgo7sha/wallet_3.png "Custom")
 
 
 </details>
@@ -68,9 +79,13 @@
 
 - Select NFT
 
+ ![NFT](https://nftstorage.link/ipfs/bafybeifdfj6j47qflrid3w2h52gjzh7w2fdxyb72o3v74zdb2ppcgo7sha/nft_1.jpeg "NFT")
+
 - Click "Play"
 
 - Use "P" to insert the nft data in the world
+
+ ![NFT](https://nftstorage.link/ipfs/bafybeifdfj6j47qflrid3w2h52gjzh7w2fdxyb72o3v74zdb2ppcgo7sha/nft_2.jpeg "NFT")
 
 </details>
 
@@ -81,9 +96,15 @@
 
 - Login with UNS;
 
+ ![UNS](https://nftstorage.link/ipfs/bafybeifdfj6j47qflrid3w2h52gjzh7w2fdxyb72o3v74zdb2ppcgo7sha/uns_1.png "UNS")
+
 - Click "Play"
 
+ ![UNS](https://nftstorage.link/ipfs/bafybeifdfj6j47qflrid3w2h52gjzh7w2fdxyb72o3v74zdb2ppcgo7sha/uns_2.png "UNS")
+
 - Use "P" to insert the uns data in the world
+
+ ![UNS](https://nftstorage.link/ipfs/bafybeifdfj6j47qflrid3w2h52gjzh7w2fdxyb72o3v74zdb2ppcgo7sha/uns_3.png "UNS")
 
 </details>
 
@@ -94,13 +115,19 @@
 
 - Do a domain at https://app.ens.domains/ on goerli testnetwork
 
+ ![ENS](https://nftstorage.link/ipfs/bafybeifdfj6j47qflrid3w2h52gjzh7w2fdxyb72o3v74zdb2ppcgo7sha/ens_1.png "ENS")
+
 - Click "Use ENS" tab;
 
 - Select ENS
 
+ ![ENS](https://nftstorage.link/ipfs/bafybeifdfj6j47qflrid3w2h52gjzh7w2fdxyb72o3v74zdb2ppcgo7sha/ens_2.jpeg "ENS")
+
 - Click "Play"
 
 - Use "P" to insert the ens data in the world
+
+ ![ENS](https://nftstorage.link/ipfs/bafybeifdfj6j47qflrid3w2h52gjzh7w2fdxyb72o3v74zdb2ppcgo7sha/ens_3.jpeg "ENS")
 
 
 </details>
@@ -112,15 +139,27 @@
 
 - Click "Connect ceramic" secondary button;
 
+ ![Ceramic](https://nftstorage.link/ipfs/bafybeifdfj6j47qflrid3w2h52gjzh7w2fdxyb72o3v74zdb2ppcgo7sha/ceramic_1.jpeg "Ceramic")
+
 - Use actual or update profile
+
+ ![Ceramic](https://nftstorage.link/ipfs/bafybeifdfj6j47qflrid3w2h52gjzh7w2fdxyb72o3v74zdb2ppcgo7sha/ceramic_2.jpeg "Ceramic")
 
 - Click "Play"
 
 - Use "P" to insert the self.id data in the world
 
+ ![Ceramic](https://nftstorage.link/ipfs/bafybeifdfj6j47qflrid3w2h52gjzh7w2fdxyb72o3v74zdb2ppcgo7sha/ceramic_3.jpeg "Ceramic")
+
 </details>
 
 
+## .env variables
+
+ - REACT_APP_NFT_STORAGE_API
+ - REACT_APP_UNS_REDIRECT
+ - REACT_APP_UNS_ID
+ - REACT_APP_STREAMR_ID
 
 # Getting Started with Create React App
 

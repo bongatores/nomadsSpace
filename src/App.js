@@ -203,7 +203,10 @@ export default function App() {
 
       try {
         const ownedENS = await getENSFrom(coinbase);
-        if (!ownedENS.data.account) return
+        if (!ownedENS.data.account) {
+          setLoadingMyENS(false);
+          return;
+        }
         const listOfOwnedDomains = ownedENS.data.account.domains
 
         console.log(listOfOwnedDomains)
@@ -263,37 +266,6 @@ export default function App() {
   }, [client, coinbase, netId, user]);
 
 
-  // const getENSFrom = async function (coinbase) {
-
-  //   console.log("coinbase", coinbase);
-
-  //   await ENSInstance.setProvider(provider)
-
-  //   console.log("ENSInstance", ENSInstance);
-
-  //   const address = coinbase;
-
-  //   let ensName = null;
-
-
-  //   console.log(await ENSInstance.getName(address));
-
-  //   ({ name: ensName } = await ENSInstance.getName(address))
-
-  //   console.log(ensName);
-
-  //   let owner = null;
-
-  //   ({ owner: owner } = await ENSInstance.getOwner(ensName));
-
-
-  //   if (ensName == null || address != owner) {
-  //     ensName = null;
-  //   }
-
-  //   return ensName;
-
-  // }
 
   return (
     <AppContext.Provider value={{ state, actions }}>
@@ -335,14 +307,7 @@ export default function App() {
                 </>
               }
               <Tabs>
-                {
-                  /*
-                  <Tab title="Write message">
-                    <Text>Message</Text>
-                    <TextInput id="textInput"/>
-                  </Tab>
-                  */
-                }
+
                 {
                   !profile &&
                   <Tab title="Use Wallet">
