@@ -338,7 +338,14 @@ export default function Game(props) {
         }
 
       }
-      else if (uriGame.endsWith('.crypto')) {
+      else if (uriGame.endsWith('.crypto') ||
+               uriGame.endsWith('.nft') ||
+               uriGame.endsWith('.blockchain') ||
+               uriGame.endsWith('.wallet') ||
+               uriGame.endsWith('.x') ||
+               uriGame.endsWith('.bitcoin') ||
+               uriGame.endsWith('.dao') ||
+               uriGame.endsWith('.888')) {
         // UNS domain
         const records = await resolution.records(
           uriGame,
