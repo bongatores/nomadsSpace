@@ -126,7 +126,7 @@ function useWeb3Modal(config = {}) {
     } catch(err){
       console.log(err);
       setConnecting(false)
-      //logoutOfWeb3Modal();
+      logoutOfWeb3Modal();
     }
 
   }, [logoutOfWeb3Modal]);

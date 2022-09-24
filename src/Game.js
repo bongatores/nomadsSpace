@@ -146,8 +146,12 @@ export default function Game(props) {
 
       case 'KeyP':
         console.log(ref.current)
-        if(ref.current?.netId !== 80001) return;
-        if(ref.current?.lock) return;
+        if(ref.current?.netId !== 80001) {
+          const text = new SpriteText(`Connect to Mumbai testnetwork first`, 4, "blue");
+          setGameMessage(text)
+          return;
+        }
+        if(!ref.current?.lock) return;
         occupySpace();
         break;
 
@@ -157,7 +161,7 @@ export default function Game(props) {
           console.log(streamId)
           console.log(ref.current);
           let text;
-          if(ref.current?.lock) return;
+          if(!ref.current?.lock) return;
           if(!ref.current?.coinbase) return;
           if(!ref.current?.streamr){
             text = new SpriteText(`Initiating StreamR ...`, 4, "blue");
@@ -517,6 +521,10 @@ export default function Game(props) {
 
   async function init() {
 
+    ref.current = {
+      ...ref.current,
+      lock: false
+    }
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
     camera.position.set(1000,2,1000)
     scene = new THREE.Scene();
@@ -533,6 +541,10 @@ export default function Game(props) {
 
     instructions.addEventListener('click', function () {
       controls.lock();
+      ref.current = {
+        ...ref.current,
+        lock: true
+      }
     });
 
     controls.addEventListener('lock', function () {
@@ -541,7 +553,7 @@ export default function Game(props) {
       blocker.style.display = 'none';
       ref.current = {
         ...ref.current,
-        lock: false
+        lock: true
       }
 
     });
@@ -552,7 +564,7 @@ export default function Game(props) {
       instructions.style.display = '';
       ref.current = {
         ...ref.current,
-        lock: true
+        lock: false
       }
     });
 
