@@ -10,6 +10,8 @@ import {
 import { ethers } from "ethers";
 
 import { ENS } from '@ensdomains/ensjs'
+import { ChatBox } from '@orbisclub/modules'
+import "@orbisclub/modules/dist/index.modern.css";
 
 import addresses from "./contracts/addresses";
 import abis from "./contracts/abis";
@@ -168,6 +170,9 @@ export default function App() {
       newGameContract = new ethers.Contract(addresses.game.rinkeby, abis.game, provider);
     } else if (netId === 5) {
       newGameContract = new ethers.Contract(addresses.game.goerli, abis.game, provider);
+    } else if (netId === 28) {
+      console.log(addresses,abis)
+      newGameContract = new ethers.Contract(addresses.game.rinkeby_boba, abis.turingGame, provider);
     } else {
       newGameContract = new ethers.Contract(addresses.game.mumbai, abis.game, provider);
     }
@@ -271,6 +276,7 @@ export default function App() {
     <AppContext.Provider value={{ state, actions }}>
       <Game client={client} getGameUris={getGameUris} />
       <Box id="blocker">
+        <ChatBox context="kjzl6cwe1jw1475m4hqp2lcvi4loinh8mwqjdbcf91xgwinopz07wvpxih8qsu6" poweredByOrbis="black" />
         <MainHeader
           loadWeb3Modal={loadWeb3Modal}
           logoutOfWeb3Modal={logoutOfWeb3Modal}
@@ -343,6 +349,7 @@ export default function App() {
               </Tabs>
               </>
           }
+
           {
             self &&
             <UseSelfIdSection

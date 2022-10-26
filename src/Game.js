@@ -8,7 +8,6 @@ import SpriteText from 'three-spritetext';
 
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-//import { AmmoPhysics } from 'three/addons/physics/AmmoPhysics.js';
 import Resolution from '@unstoppabledomains/resolution';
 
 
@@ -20,7 +19,7 @@ import {
   subscribeStreamR,
   publishMessageStreamr
 } from './hooks/Streamr.js';
-
+// Change self.id for ORBIS
 const core = new Core({ ceramic: 'testnet-clay' })
 
 const resolution = Resolution.fromEthersProvider(new ethers.providers.JsonRpcProvider("https://rpc-mainnet.maticvigil.com"));
@@ -59,6 +58,7 @@ export default function Game(props) {
   const vertex = new THREE.Vector3();
   const color = new THREE.Color();
   const infos = [];
+  let collision = false;
   const streamrTexts = [];
   let gameText;
 
@@ -146,8 +146,8 @@ export default function Game(props) {
 
       case 'KeyP':
         console.log(ref.current)
-        if(ref.current?.netId !== 80001) {
-          const text = new SpriteText(`Connect to Mumbai testnetwork first`, 4, "blue");
+        if(ref.current?.netId !== 80001 && ref.current?.netId !== 28) {
+          const text = new SpriteText(`Connect to Mumbai or Boba Rinkeby testnetwork first`, 4, "blue");
           setGameMessage(text)
           return;
         }
@@ -157,6 +157,7 @@ export default function Game(props) {
 
       case 'KeyM':
         try{
+          // USE ORBIS INSTEAD
           const streamId = "0xdd3b7754aee323a8b51cb8e063e8fc4a31e5c2cc/empty-space";
           console.log(streamId)
           console.log(ref.current);
@@ -188,7 +189,18 @@ export default function Game(props) {
           console.log(err)
         }
         break;
-
+      case 'KeyU':
+        const vector = camera.position.clone();
+        const x = (vector.x/10).toFixed(0);
+        const z = (vector.z/10).toFixed(0);
+        const info = infos[`${x}_${z}`]
+        if(info?.uri){
+          const y = window.confirm(`Open ${info.uri} ?`);
+          if(y){
+            window.open(info.uri,"_blank")
+          }
+        }
+        break;
       case 'Space':
         if (canJump === true) velocity.y += 350;
         canJump = false;
@@ -251,6 +263,9 @@ export default function Game(props) {
     const uriGame = info.uri;
     let metadata;
     console.log(`${uriGame} at ${info.x},${info.z}`)
+    if(infos[`${info.x}_${info.z}`]){
+      scene.remove(infos[`${info.x}_${info.z}`]);
+    }
     try{
       if (uriGame.startsWith("did:3")) {
         // Get profile info from ceramic.network
@@ -371,7 +386,7 @@ export default function Game(props) {
           image: records["profile.image.value"] ?
                  records["profile.image.value"] :
                  `https://metadata.unstoppabledomains.com/image-src/${uriGame}.svg`,
-          external_url: records["ipfs.html.value"],
+          external_url: records["ipfs.html.value"] && `ipfs://${records["ipfs.html.value"]} `,
           scenario: records["emptyspace.gltf.value"]
         }
       } else {
@@ -380,18 +395,25 @@ export default function Game(props) {
       }
 
       const gameInfo = new THREE.Group()
+      var geometry = new THREE.BoxGeometry(14, 14, 14, 1, 1, 1);
       const imgTexture = new THREE.TextureLoader().load(metadata.image.replace("ipfs://", "https://nftstorage.link/ipfs/"));
-      const material = new THREE.SpriteMaterial({ map: imgTexture });
-      const sprite = new THREE.Sprite(material);
+
+      const material = new THREE.MeshBasicMaterial({ map: imgTexture,transparent:true, opacity: 1 });
+      const cube = new THREE.Mesh(geometry,material);
+
+      const materialSprite = new THREE.SpriteMaterial({ map: imgTexture });
+      const sprite = new THREE.Sprite(materialSprite);
+      sprite.scale.set(10, 10, 10)
       console.log(metadata)
-      const name = new SpriteText(metadata.name, 8, "red");
+      const name = new SpriteText(metadata.name, 5, "red");
       const description = new SpriteText(metadata.description, 3, "blue")
-      const external_url = new SpriteText(metadata.external_url, 1, "green")
-      sprite.scale.set(20, 20, 20)
+      const external_url = new SpriteText(metadata.external_url, 1, "green");
       name.position.y = 40;
       description.position.y = 25;
-      external_url.position.y = 12
+      external_url.position.y = 20
+      sprite.position.y = 12;
       gameInfo.add(sprite)
+      gameInfo.add(cube)
       gameInfo.add(name)
       gameInfo.add(description)
       gameInfo.add(external_url)
@@ -407,7 +429,6 @@ export default function Game(props) {
         });
       }
 
-      scene.add(gameInfo);
       if(metadata.scenario){
         const loader = new GLTFLoader().setPath(`https://nftstorage.link/ipfs/${metadata.scenario}/gltf/` );
         loader.load( 'scene.gltf', function ( gltf ) {
@@ -419,8 +440,16 @@ export default function Game(props) {
 
         } );
       }
-      gameInfo.position.set(info.x*10, 10, info.z*10)
-      infos[`${info.x}_${info.y}`] = gameInfo;
+      gameInfo.position.set(info.x*10, 5 , info.z*10)
+      console.log(gameInfo.position)
+      gameInfo.scale.set(0.5,0.5,0.5)
+      gameInfo.name = metadata.name;
+      gameInfo.uri = metadata.external_url?.replace("ipfs://","https://ipfs.io/ipfs/");
+      scene.add(gameInfo);
+      infos[`${info.x}_${info.z}`] = gameInfo;
+
+
+
     } catch(err){
       console.log(err)
     }
@@ -454,9 +483,9 @@ export default function Game(props) {
     let text;
     if (result) {
       if (uri === ref.current?.uri) {
-        text = new SpriteText("The space is yours!", 8, "green");
+        text = new SpriteText("The space is yours!", 5, "green");
       } else {
-        text = new SpriteText("Someone won a space!", 8, "blue");
+        text = new SpriteText("Someone won a space!", 5, "blue");
       }
       scene.remove(infos[`${x}_${z}`]);
       await addInfo({
@@ -467,9 +496,9 @@ export default function Game(props) {
     } else {
       let i = 0;
       if (uri === ref.current?.uri) {
-        text = new SpriteText("You could not get the space, try again!", 8, "red");
+        text = new SpriteText("You could not get the space, try again!", 5, "red");
       } else {
-        text = new SpriteText("Someone tried to get a space!", 8, "blue");
+        text = new SpriteText("Someone tried to get a space!", 5, "blue");
       }
     }
     setGameMessage(text);
@@ -526,11 +555,10 @@ export default function Game(props) {
       lock: false
     }
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position.set(1000,2,1000)
+    camera.position.set(1000,1,1000)
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xffffff);
     scene.fog = new THREE.Fog(0xffffff, 0, 750);
-
     const light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 0.75);
     light.position.set(0.5, 1, 0.75);
     scene.add(light);
@@ -599,7 +627,6 @@ export default function Game(props) {
   }
 
   async function animate() {
-
     const contractInitiated = ref.current?.contractInitiated;
     const client = ref.current?.client;
     if (!contractInitiated && client) {
@@ -663,7 +690,17 @@ export default function Game(props) {
       }
 
     }
-
+    camera.updateMatrixWorld();
+    /*
+    const vector = camera.position.clone();
+    const x = (vector.x/10).toFixed(0);
+    const z = (vector.z/10).toFixed(0);
+    const info = infos[`${x}_${z}`]
+    if(info && !gameText){
+      const text = new SpriteText(`Press P to try to get the space from ${info.name}`, 3, "blue");
+      setGameMessage(text)
+    }
+    */
     prevTime = time;
 
     renderer?.render(scene, camera);
