@@ -16,7 +16,7 @@ export default function MainHeader(props){
 
   return(
     <Header background="brand" align="start" className='navbar'>
-      <Heading className='heading' margin="small">EMPTY Space</Heading>
+      <Heading className='heading' margin="small">Nomads Space</Heading>
       <Box align="end" pad="small" alignContent="center" >
         {
           state.coinbase ?

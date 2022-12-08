@@ -24,23 +24,23 @@ export default function GameHeader(props){
         marginTop:'5px',
         display:'block',
       }
-    }>Empty Space</span></Heading>
+    }>Nomads Space</span></Heading>
     <p style={
       {
         textAlign: 'center'
       }
     }>
-      A game where every space is your space until it's not. <br/>
-      Start playing now!
+      A space to tell everyone about your adventures around the world.
     </p>
-
     <Box direction="row" style={
       {
         marginBottom: '15px'
       }
     }>
+
       <Button primary label="Click to play" id="instructions" />
       {
+        /*
         !state.coinbase ?
         <Button onClick={props.loadWeb3Modal} label="Connect wallet" /> :
         !state.self &&
@@ -53,6 +53,7 @@ export default function GameHeader(props){
           props.setProfile(newProfile);
           props.setUri(newSelf.id);
         }} label="Connect ceramic" />
+        */
       }
     </Box>
     {/* <Paragraph style={{wordBreak: 'break-word'}}>
