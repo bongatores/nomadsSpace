@@ -1,6 +1,4 @@
-# EmptySpace
-
-  A 3d space where all places can be yours until someone removes them from you.
+# NomadSpace
 
   This dapp allows users to explore and modify an empty world by inserting data in it.
 
@@ -15,18 +13,17 @@
   - **TheGraph** - gets NFTs and ENS from connected wallet, get positions occupied by users data in the game (custom graph deployed at https://thegraph.com/hosted-service/subgraph/henrique1837/empty-space);
   - **ENS** - gets data from ENS domains (avatar, description, name) to display;
   - **UNS** - allows user login with his UNS domain in order to insert it as the data source in the world;
-  - **StreamR** - allows connected users to send hello message to all possible connected users;
   - **Ceramic** - used as data for decentralized identities inserted in the contract;
   - **Polygon Mumbai Testnetwork** - game contract deployed at https://mumbai.polygonscan.com/address/0x441ea25a2cd3343fcd1e958c1bfcb0376ffa8b75
   - **Chainlink VRF** - simulates battle for the occupied space;
 
 ## Demo Video
 
- - https://bafybeih5oyecfiyapbdmxxvown4hq7m4un3xmms7bwz6gemywooegphscy.ipfs.dweb.link/
+ - https://bafybeidu4hbqvnr5p7k3njhsgdz3n6z76gqiqvzxgzd72sh4cw2o4gruv4.ipfs.nftstorage.link/
 
 ## Demo
 
- - https://empty-space.on.fleek.co/
+ - https://nomadspace.on.fleek.co/
 
 ## Testing Guide
 
@@ -160,7 +157,6 @@
  - `REACT_APP_NFT_STORAGE_API`
  - `REACT_APP_UNS_REDIRECT`
  - `REACT_APP_UNS_ID`
- - `REACT_APP_STREAMR_ID`
 
 # Getting Started with Create React App
 
